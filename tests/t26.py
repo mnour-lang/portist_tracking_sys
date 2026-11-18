@@ -6,7 +6,7 @@ LS.set('pst_inv',{'PST-0001':{rcv:'شركة الأمل',date:'2026-11-01',t:2400
 LS.set('pst_rc',{'RC-0001':{rcv:'شركة الأمل',date:new Date().toISOString().slice(0,10),t:300,cur:'$',type:'money',st:'valid',items:[],ts:1}});
 LS.set('pst_ship',{'SH-0001':{code:'SH-0001',bl:'BLX9',st:'ld',cons:[{id:'k1',cust:'شركة الأمل',goods:'قماش',pk:2,dl:[]}],costs:[],hist:[],ts:1,ver:1}});ALL=null}"""
 with sync_playwright() as p:
-    b=p.chromium.launch();pg=b.new_page(viewport={'width':1300,'height':900})
+    b=p.chromium.launch();pg=b.new_page(viewport={'width':850,'height':900})
     errs=[];pg.on('pageerror',lambda e:errs.append(str(e)))
     pg.goto(APP);pg.wait_for_timeout(500)
     pg.fill('#lgName','م');pg.fill('#lgUser','admin');pg.fill('#lgPass','secret1');pg.fill('#lgPass2','secret1');pg.click('#lgGo');pg.wait_for_timeout(500)
