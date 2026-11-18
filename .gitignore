@@ -1,9 +1,8 @@
 # ملفات الإنتاج والنسخ الاحتياطية (قد تحوي بيانات وكلمات سر)
 *.json
+!vercel.json
 backup*
 *.bak
-# نسخة النشر تُولَّد بسكربت publish
-index.html
 *.zip
 .DS_Store
 Thumbs.db

@@ -32,3 +32,8 @@
 ## الاختبارات
 `bash tests/run_all.sh` — يشغّل اختبارات السيرفر (محاكاة Code.gs) واختبارات المتصفح (Playwright) واختبار جهازين متصلين بالسيرفر المحاكى.
 المتطلبات: node و python3 و `pip install playwright && playwright install chromium`. شغّلها قبل كل إصدار.
+
+## النشر على Vercel
+- المشروع صفحة ثابتة: الملف المنشور هو `public/index.html` (نسخة من `portist_invoice.html`، يولّدها `publish.sh`/`publish.bat`).
+- إعدادات Vercel: Framework = Other، Build Command فارغ، Output Directory = `public` (مضبوطة في `vercel.json`).
+- بعد كل تعديل: شغّل `sh publish.sh` ثم commit و push.

@@ -1,3 +1,3 @@
 #!/bin/sh
-# ينسخ الملف الأساسي إلى index.html للاستضافة (GitHub Pages أو غيرها)
-cp portist_invoice.html index.html && echo "تم إنشاء index.html — ارفعه إلى الاستضافة"
+# ينسخ الملف الأساسي إلى public/index.html (المجلد الذي تنشره Vercel)
+mkdir -p public && cp portist_invoice.html public/index.html && echo "تم تحديث public/index.html — اعمل commit و push وVercel ينشر تلقائياً"
