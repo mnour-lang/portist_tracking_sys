@@ -226,7 +226,7 @@ body.rfit .rsheet{width:198mm!important;min-height:0!important;padding:6mm}
 @page{size:A4;margin:8mm 0}
 html,body{background:#fff}
 :root{padding:0}
-.bar,.x,.cur,.modal,#hwrap,#lockBar,#login,.rform,.addrow,.toast,.fe,.menu{display:none!important}
+.bar,.x,.cur,.modal,#hwrap,#awrap,#cwrap,#gwrap,#lockBar,#login,.rform,.addrow,.toast,.fe,.menu{display:none!important}
 .wrap{padding:0;overflow:visible}
 .sheet{box-shadow:none;margin:0;width:210mm;min-height:279mm;display:block}
 thead{display:table-header-group}tr{break-inside:avoid}footer{margin-top:6mm}
@@ -238,6 +238,19 @@ textarea{overflow:hidden}
 ::placeholder{color:transparent!important;opacity:0!important}
 }
 .mp.wide{width:min(1180px,97vw)}
+.tab[hidden]{display:none}
+.aH{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px}.aH h2{margin:0;font-size:15pt;color:var(--teal-d)}
+.aSeg{display:inline-flex;background:var(--tint);border-radius:10px;padding:3px}.aSeg button{background:transparent;color:var(--teal-d);padding:6px 16px;border-radius:8px}.aSeg button.on{background:var(--teal);color:#fff}
+#awrap .flt,#cwrap .flt{margin-top:0}
+.gGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}.gCard{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff}.gCard h3{margin:0 0 8px;font-size:11pt;color:var(--teal-d)}
+.gCard button,.gCard label.lb{display:block;width:100%;text-align:start;background:var(--tint);color:var(--teal-d);padding:9px 12px;border-radius:8px;margin-bottom:6px;cursor:pointer;font-weight:600;box-sizing:border-box}
+.gCard .mh2{font-size:9pt;color:var(--muted);margin:6px 0 4px}.gCard .mrow,.gCard .opts{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px;font-size:10pt}.gCard .opts{display:block}
+.gDanger{border-color:#e7b4bb;background:#fff8f8}.gDanger h3{color:#c0392b}.gCard #gReset{background:#fdeaed;color:#c0392b;width:auto}
+.gsw{position:relative;flex:1;min-width:150px;max-width:380px}.gsw input{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:999px;padding:8px 14px;font:inherit;font-size:10pt;background:#fff}
+.gsBox{position:absolute;top:calc(100% + 4px);inset-inline:0;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(10,40,44,.2);max-height:65vh;overflow:auto;z-index:40;min-width:290px}
+.gsH{font-size:8.5pt;color:var(--muted);background:var(--tint);padding:4px 12px;position:sticky;top:0}.gsI{display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:start;background:#fff;border-radius:0;padding:7px 12px;font-weight:600;color:var(--ink);border-bottom:1px solid #f0f4f4}.gsI:hover,.gsI:focus{background:var(--tint)}.gsI small{color:var(--muted);font-weight:400;font-size:8.5pt}.gsE{padding:14px;color:var(--muted);font-size:9.5pt;text-align:center}
+#shFlow{display:flex;gap:6px;flex-wrap:wrap;align-items:stretch;margin:10px 0 2px}.fl{flex:1;min-width:130px;border:1px solid var(--line);border-radius:10px;padding:7px 10px;display:flex;flex-direction:column;gap:3px;font-size:9.5pt;color:var(--muted);background:#fff}.fl b{font-size:10pt}.fl.done{background:var(--tint);color:var(--teal-d)}.fl.now{border:2px solid var(--teal);color:var(--ink,#1b2c30)}.fl button{align-self:flex-start;padding:4px 10px;font-size:8.8pt}
+@media(max-width:700px){.gsw{order:3;flex:1 1 100%;max-width:none}.bg1{order:4}}
 #mCons .mp.wide{min-height:0}
 .dz{margin-top:28px;padding:12px 14px;border:1px dashed #e7b4bb;border-radius:10px;background:#fff8f8}.dz .shH{margin:0 0 4px}
 #shCons .acts .b2{background:transparent;border:1px solid var(--line);color:var(--teal-d);font-weight:500}#shCons .acts .b2:hover{background:var(--tint)}
@@ -384,7 +397,8 @@ body.mode-h #bPrint,body.mode-h #bShare{display:none}
 </div></div>
 <div class="bar">
   <div class="brand"><img id="brandImg" alt=""><b>Portist Lojistik</b></div>
-  <div class="bg1"><div class="tabs"><button class="tab on" id="tabH">الشحنات</button><button class="tab" id="tabI" data-pm="inv">فاتورة</button><button class="tab" id="tabR" data-pm="rc">وصل استلام</button></div><span id="uChip" class="ss" title="المستخدم الحالي"></span><button type="button" id="qBadge" class="ss" style="display:none;cursor:pointer;border:0;font:inherit"></button><span id="saveState" class="ss" role="status"></span></div>
+  <div class="gsw"><input id="gs" type="search" placeholder="بحث عام: شحنة، فاتورة، وصل، عميل…  (Ctrl+K)" autocomplete="off" aria-label="بحث عام"><div id="gsBox" class="gsBox" hidden></div></div>
+  <div class="bg1"><div class="tabs"><button class="tab on" id="tabH">الشحنات</button><button class="tab" id="tabA">المحاسبة</button><button class="tab" id="tabC" data-pm="cust">العملاء</button><button class="tab" id="tabI" data-pm="inv" hidden></button><button class="tab" id="tabR" data-pm="rc" hidden></button></div><span id="uChip" class="ss" title="المستخدم الحالي"></span><button type="button" id="qBadge" class="ss" style="display:none;cursor:pointer;border:0;font:inherit"></button><span id="saveState" class="ss" role="status"></span></div>
   <div class="bg2">
     <button class="pb ghost inv-only" id="bList" title="الفواتير المحفوظة"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>الفواتير</span></button>
     <button class="pb ghost rc-only" id="bRList" title="الوصولات المحفوظة"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>الوصولات</span></button>
@@ -394,7 +408,7 @@ body.mode-h #bPrint,body.mode-h #bShare{display:none}
     <button class="pb wa" id="bShare" title="مشاركة PDF عبر واتساب"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="m8.2 10.8 7.6-3.6M8.2 13.2l7.6 3.6"/></svg><span>مشاركة</span></button>
     <button class="pb main s-only" data-pm="rc" id="bSPay" title="تسجيل دفعة لهذا العميل"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>تسجيل دفعة</span></button>
     <button class="pb ghost s-only" id="bSBack" title="رجوع"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg><span>رجوع</span></button>
-        <button class="pb ghost" data-pm="cust" id="bCust" title="دليل العملاء"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0M16 5.2a3.2 3.2 0 0 1 0 5.6M18 14.5a6 6 0 0 1 3 5.5"/></svg><span>العملاء</span></button>
+        <button class="pb ghost" data-pm="cust" id="bCust" title="دليل العملاء" style="display:none"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0M16 5.2a3.2 3.2 0 0 1 0 5.6M18 14.5a6 6 0 0 1 3 5.5"/></svg><span>العملاء</span></button>
     <button class="pb ghost" id="bMore" aria-haspopup="true" aria-expanded="false" title="المزيد"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/></svg></button>
   </div>
   <span id="msg" hidden></span>
@@ -404,6 +418,7 @@ body.mode-h #bPrint,body.mode-h #bShare{display:none}
     <button id="bUsers" data-pm="users">المستخدمون والصلاحيات</button>
     <button id="bLog" data-pm="users">سجل العمليات</button>
     <button id="bLogout">تسجيل الخروج</button>
+    <button id="bSettings">⚙ الإعدادات</button>
     <div class="mh2 inv-only">الفاتورة</div>
     <button class="inv-only" id="bCols" data-pm="settings">الأعمدة وترتيبها</button>
     <button class="inv-only" id="bUndo">تراجع (Ctrl+Z)</button>
@@ -421,7 +436,6 @@ body.mode-h #bPrint,body.mode-h #bShare{display:none}
     <button id="bAudit" data-pm="audit">فحص التطابق المحاسبي</button>
     <button id="bBackup">نسخة احتياطية وتصفير البيانات</button>
     <label class="lb" data-pm="settings">رفع الختم<input type="file" id="stampFile" accept="image/*" hidden></label>
-    <button id="bConn" data-pm="settings">ربط الخادم</button>
   </div>
 </div>
 <div class="wrap" id="iwrap"><div id="lockBar" style="display:none"><span>🔒 الفاتورة صادرة ومقفلة عن التعديل حفاظاً على تطابق السجلات. فُكَّ القفل فقط إن كنت تدرك أثر التعديل.</span><button class="b2" id="bUnlock" type="button">فك القفل</button></div>
@@ -505,12 +519,25 @@ body.mode-h #bPrint,body.mode-h #bShare{display:none}
 <p class="hint">عند تغيير اسم العميل يُحفظ الاسم القديم كاسم بديل، فتبقى فواتيره ووصولاته وحمولاته القديمة مرتبطة به ولا يتغير رصيده.</p>
 <div class="cr" style="border:0"><button class="b1" id="cf_save" type="button">حفظ</button><button class="b2" id="cf_cancel" type="button">إلغاء</button><button class="b3" id="cf_del" type="button" style="display:none">حذف العميل</button></div></div>
 <div id="cList"></div>
-<p class="hint">يُضاف العميل تلقائياً عند حفظ فاتورة أو وصل باسمه. الربط بين العميل وفواتيره يتم بالاسم، فيجب أن يتطابق اسم «المستلم» في الفاتورة مع اسم العميل. الرصيد = إجمالي الفواتير (بدون المسودات) − المدفوع. دليل العملاء محفوظ على هذا الجهاز فقط.</p></div></div>
+<p class="hint">يُضاف العميل تلقائياً عند حفظ فاتورة أو وصل باسمه. يُربط العميل بفواتيره ووصولاته باسمه الحالي أو بأسمائه السابقة. الرصيد = إجمالي الفواتير (بدون المسودات) − المدفوع. دليل العملاء محفوظ على هذا الجهاز فقط.</p></div></div>
+<div class="wrap" id="awrap" style="display:none"><div class="page">
+<div class="aH"><h2>المحاسبة</h2><span class="aSeg"><button type="button" id="aTI" class="on">الفواتير</button><button type="button" id="aTR">الوصولات</button></span><span style="flex:1"></span><button class="b1" id="aNewInv" data-pm="inv" type="button">+ فاتورة جديدة</button><button class="b1" id="aNewRc" data-pm="rc" type="button">+ وصل جديد</button></div>
+<div class="kpi" id="aKpi"></div>
+<div id="aInvP"><div id="aInvBody"></div></div><div id="aRcP" style="display:none"><div id="aRcBody"></div></div>
+</div></div>
+<div class="wrap" id="cwrap" style="display:none"><div class="page"><div class="aH"><h2>دليل العملاء</h2></div><div id="cBody"></div></div></div>
+<div class="wrap" id="gwrap" style="display:none"><div class="page"><div class="aH"><h2>الإعدادات</h2></div><div class="gGrid">
+<section class="gCard"><h3>الفاتورة والطباعة</h3><div id="gInv"></div></section>
+<section class="gCard" data-pm="users"><h3>المستخدمون والأمان</h3><div id="gUsr"></div></section>
+<section class="gCard"><h3>التدقيق والنسخ الاحتياطي</h3><div id="gDat"></div></section>
+<section class="gCard" data-pm="settings"><h3>الربط بالخادم</h3><div id="gConn"></div></section>
+<section class="gCard gDanger" data-pm="reset"><h3>منطقة الخطر</h3><p class="hint" style="margin:0 0 8px">تصفير البيانات يحذف كل الفواتير والوصولات والشحنات من هذا الجهاز. خذ نسخة احتياطية قبله.</p><button class="b3" id="gReset" type="button">تصفير جميع البيانات…</button></div>
+</div></div></div>
 <div id="hwrap" style="display:none"><div class="page">
 <div id="shLst"><div class="flt"><input id="shq" type="search" placeholder="بحث برقم الشحنة أو البوليصة أو الحاوية أو العميل"><select id="shfs"><option value="">كل الحالات</option><option value="ld">محمّلة</option><option value="tr">في الطريق</option><option value="ar">وصلت</option><option value="cu">تخليص جمركي</option><option value="dn">سُلّمت</option></select><button class="b1" id="shNew" data-pm="ship" type="button">+ شحنة جديدة</button></div><div id="shTodo"></div><div class="kpi" id="shKpi"></div><div class="chips" id="shChips"></div><p class="hint" id="shSum" style="margin-top:0"></p><div id="shList"></div>
 <p class="hint">الشحنة الواحدة قد تضم عدة عملاء. لكل عميل حمولته وفاتورته وتسليمه (كامل أو جزئي). يُحسب المتبقي من الفواتير المرتبطة بحمولة العميل.</p></div>
 <div id="shEd" style="display:none"><div class="shBar"><button class="b2" id="shBack" type="button">← القائمة</button><h2 id="shTitle" dir="ltr"></h2><span id="shTitleSt"></span><span style="flex:1"></span><button class="b2" id="sh_rep" type="button">تقرير التسليم</button><button class="b3" id="sh_del" data-pm="ship_del" type="button">حذف الشحنة</button><button class="b1" id="sh_save" type="button">حفظ الشحنة</button></div>
-<h3 class="shH">مسار الشحنة</h3><div class="shStep" id="shStep"></div><div id="shClose"></div><div class="cr" style="border:0"><label class="ndl" data-pm="ship">تاريخ المرحلة الجديدة<input type="date" id="sh_nd"></label><button class="b1" id="sh_next" data-pm="ship" type="button"></button><button class="b2" id="sh_prev" data-pm="ship" type="button"></button><span class="hint">تصبح الشحنة «سُلّمت» تلقائياً عند تسليم كل الحمولات.</span></div>
+<div id="shFlow"></div><h3 class="shH">مسار الشحنة</h3><div class="shStep" id="shStep"></div><div id="shClose"></div><div class="cr" style="border:0"><label class="ndl" data-pm="ship">تاريخ المرحلة الجديدة<input type="date" id="sh_nd"></label><button class="b1" id="sh_next" data-pm="ship" type="button"></button><button class="b2" id="sh_prev" data-pm="ship" type="button"></button><span class="hint">تصبح الشحنة «سُلّمت» تلقائياً عند تسليم كل الحمولات.</span></div>
 <h3 class="shH">بيانات الشحنة</h3>
 <div class="rg"><label>رقم الشحنة<input id="sh_code" dir="ltr"></label><label>طريقة الشحن<select id="sh_mode"><option value="sea">بحري</option><option value="air">جوي</option><option value="land">بري</option></select></label><label>البوليصة BL / AWB<input id="sh_bl" dir="ltr"></label><label>رقم الحاوية<input id="sh_cont" dir="ltr"></label><label>الناقل / الباخرة<input id="sh_car"></label><label>المنشأ<input id="sh_from"></label><label>الوجهة<input id="sh_to"></label><label>تاريخ الشحن<input id="sh_sd" type="date"></label><label>الوصول المتوقع<input id="sh_eta" type="date"></label><label>إجمالي أجرة الشحن<input id="sh_fr" inputmode="decimal" dir="ltr"></label><label>العملة<input id="sh_cur" style="width:80px"></label><label class="w4">ملاحظات<input id="sh_notes"></label></div>
 <h3 class="shH">حمولات العملاء</h3><div class="shScroll" id="shCons"></div>
@@ -886,10 +913,10 @@ function rdrawList(){const q=$('rq').value.trim().toLowerCase(),D=RLISTD,ks=Obje
   const head='<div class="lsG lsR h"><span>الرقم</span><span>استلمنا من</span><span>التاريخ</span><span>المبلغ</span><span>الحالة</span><span></span></div>';
   $('rList').innerHTML=ks.length?head+ks.map(k=>{const d=D[k],vd=d.st==='void';
     return `<div class="lsG lsR"><button class="b2" data-o="${esc(k)}" style="font-weight:700"><span dir="ltr">${esc(k)}</span></button><span data-l="استلمنا من"><b>${esc(d.rcv||'—')}</b></span><span data-l="التاريخ" dir="ltr" class="mu" style="text-align:start">${esc(d.date||'—')}</span><span data-l="المبلغ"><b${vd?' style="text-decoration:line-through"':''}>${fm(num(d.t),esc(d.cur||''))}</b></span><span data-l="الحالة">${vd?'<span class="bd" style="background:#fdeaed;color:#c0392b">ملغى</span>':'<span class="bd s-paid">مسجَّل</span>'}</span><span class="acts"><button class="b2" data-o="${esc(k)}">فتح</button><button class="b2" data-c="${esc(k)}">نسخ</button></span></div>`}).join(''):'<div class="empty">لا توجد وصولات مطابقة.</div>'}
-function setMode(m){S.mode=m;document.body.classList.toggle('mode-r',m==='r');document.body.classList.toggle('mode-h',m==='h');$('tabH').classList.toggle('on',m==='h');$('tabI').classList.toggle('on',m==='i');$('tabR').classList.toggle('on',m==='r');$('hwrap').style.display=m==='h'?'':'none';
-  document.body.classList.toggle('mode-s',m==='s');$('iwrap').style.display=m==='i'?'':'none';$('rwrap').style.display=m==='r'?'':'none';$('swrap').style.display=m==='s'?'':'none';{const x=rfit();document.body.classList.toggle('rfit',x);document.documentElement.classList.toggle('rfit',x)}setLand(S.land);if(m==='r'){refInv();rdraw();loadAll().then(()=>{if(S.mode==='r'){R.sig='';rAllocTick()}})}if(m==='h')shDraw();fitZoom();upd()}
+function setMode(m){S.mode=m;const nav=m==='h'||m==='a'||m==='c'||m==='g';document.body.classList.toggle('mode-r',m==='r');document.body.classList.toggle('mode-h',nav);$('tabH').classList.toggle('on',m==='h');$('tabA').classList.toggle('on',m==='a'||m==='i'||m==='r');$('tabC').classList.toggle('on',m==='c'||m==='s');$('tabI').classList.toggle('on',m==='i');$('tabR').classList.toggle('on',m==='r');$('hwrap').style.display=m==='h'?'':'none';$('awrap').style.display=m==='a'?'':'none';$('cwrap').style.display=m==='c'?'':'none';$('gwrap').style.display=m==='g'?'':'none';if(m==='h'||m==='a'||m==='c')LS.set('pst_land',m);
+  document.body.classList.toggle('mode-s',m==='s');$('iwrap').style.display=m==='i'?'':'none';$('rwrap').style.display=m==='r'?'':'none';$('swrap').style.display=m==='s'?'':'none';{const x=rfit();document.body.classList.toggle('rfit',x);document.documentElement.classList.toggle('rfit',x)}setLand(S.land);if(m==='r'){refInv();rdraw();loadAll().then(()=>{if(S.mode==='r'){R.sig='';rAllocTick()}})}if(m==='h')shDraw();if(m==='a')accInit();if(m==='c')cPage();fitZoom();upd()}
 const DIRTY={i:false,r:false},SAVED={i:false,r:false};
-function upd(){const el=$('saveState'),m=S.mode,d=DIRTY[m];if(m==='h'){el.className='ss';el.textContent='';return}if(m==='s'){el.className='ss';el.textContent='كشف حساب';return}el.className='ss '+(d?'dirty':SAVED[m]?'ok':'');el.textContent=d?'● تعديلات غير محفوظة':SAVED[m]?'✓ محفوظ':(m==='r'?'وصل جديد':'فاتورة جديدة')}
+function upd(){const el=$('saveState'),m=S.mode,d=DIRTY[m];if(m==='h'||m==='a'||m==='c'||m==='g'){el.className='ss';el.textContent='';return}if(m==='s'){el.className='ss';el.textContent='كشف حساب';return}el.className='ss '+(d?'dirty':SAVED[m]?'ok':'');el.textContent=d?'● تعديلات غير محفوظة':SAVED[m]?'✓ محفوظ':(m==='r'?'وصل جديد':'فاتورة جديدة')}
 function setClean(m,saved){DIRTY[m]=false;SAVED[m]=saved;upd()}
 function markDirty(){DIRTY[S.mode]=true;upd()}
 function toast(t,k){const el=$('toast');el.textContent=t;el.className='toast show '+(k||(/^تم|✓/.test(t)?'ok':/تعذر|فشل|مستخدم|خطأ|مطلوب|أكبر|اكتب|أضف|غير موجود|تنبيه|⚠|✗/.test(t)?'err':''));clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),4200)}
@@ -941,7 +968,8 @@ function cDraw(){const q=nk($('cq').value),A=ALL||{I:{},Rc:{}},C=Object.values(C
   const head='<div class="lsG lsC h"><span>العميل</span><span>الهاتف</span><span>الرصيد</span><span></span></div>';
   $('cList').innerHTML=C.length?head+C.map(c=>{const M=sumOf(docsOf(c,A)),bal=Object.entries(M).map(([cu,m])=>({cu:cu,b:m.bal})).filter(x=>Math.abs(x.b)>.004);
     return `<div class="lsG lsC"><span><b>${esc(c.name)}</b>${(c.aliases||[]).length?`<br><span class="mu">سابقاً: ${esc(c.aliases.join('، '))}</span>`:''}${c.addr?`<br><span class="mu">${esc(c.addr)}</span>`:''}</span><span data-l="الهاتف" dir="ltr" class="mu" style="text-align:start">${esc(c.phone||'—')}</span><span data-l="الرصيد">${bal.length?bal.map(x=>`<span class="bd ${x.b>0?'s-partial':'s-paid'}">${x.b>0?'عليه':'له'} ${fm(Math.abs(x.b),esc(x.cu))}</span>`).join(' '):'<span class="bd s-paid">لا ذمم</span>'}</span><span class="acts"><button class="b2" data-st="${c.id}">كشف حساب</button><button class="b2" data-pm="inv" data-ni="${c.id}">فاتورة</button><button class="b2" data-pm="rc" data-nr="${c.id}">وصل</button><button class="ib" data-ed="${c.id}" title="تعديل بيانات العميل">${IC.edit}</button></span></div>`}).join(''):'<div class="empty">لا يوجد عملاء بعد.<br><span>يُضاف العميل تلقائياً عند حفظ فاتورة أو وصل باسمه.</span></div>'}
-async function cOpen(){if(!need('cust'))return;$('mCust').classList.add('on');$('cForm').style.display='none';cDraw();await loadAll();cDraw()}
+async function cOpen(){if(!need('cust'))return;setMode('c')}
+async function cPage(){$('cForm').style.display='none';cDraw();await loadAll();if(S.mode==='c')cDraw()}
 function cEdit(id){const c=id?CU.get()[id]:{};$('cForm').style.display='';$('cf_id').value=id||'';$('cf_name').value=c.name||'';$('cf_name').readOnly=false;$('cf_phone').value=c.phone||'';$('cf_addr').value=c.addr||'';$('cf_notes').value=c.notes||'';$('cf_del').style.display=id?'':'none';(id?$('cf_phone'):$('cf_name')).focus()}
 function cSaveForm(){const id=$('cf_id').value,n=$('cf_name').value.trim();if(!n){bad($('cf_name'),'اسم العميل مطلوب');return}
   const D=CU.get();{const ex=findCust(n);if(ex&&ex.id!==id){bad($('cf_name'),'الاسم مستخدم لعميل آخر: «'+ex.name+'»');return}}
@@ -975,7 +1003,7 @@ function sDraw(){$('bSPay').style.display=S.sheetFn?'none':'';if(S.sheetFn){$('s
     h+=`<h3 class="st-h">${L('كشف الحركة','Statement of movements','Hesap hareketleri')} (${esc(cu)})</h3><table class="rc-tb lg-tb"><thead><tr><th>${T('date')}</th><th>${T('code')}</th><th>${L('البيان','Description','Açıklama')}</th><th>${L('مدين','Debit','Borç')}</th><th>${L('دائن','Credit','Alacak')}</th><th>${L('الرصيد','Balance','Bakiye')}</th></tr></thead><tbody>${E.map(e=>`<tr class="${e.muted?'mu':''} ${e.vd?'vd':''}"><td>${esc(e.date)}</td><td dir="ltr">${esc(e.code||'')}</td><td>${e.desc}${e.sub?`<small>${e.sub}</small>`:''}</td><td>${e.dr?f(e.dr):''}</td><td>${e.cr?f(e.cr):''}</td><td>${e.muted?'':f(e.bal)}</td></tr>`).join('')}</tbody></table>`});
   h+=`<div class="st-ft">${esc($('foot').value)}${$('foot').value?'<br>':''}<b>Portist Lojistik</b> · Import &amp; Export · ${T('note')}</div>`;
   $('spaper').innerHTML=h}
-async function sOpen(id){const c=CU.get()[id];if(!c)return;toast('جارٍ تجهيز كشف الحساب...');const A=await loadAll();S.sheetFn=null;S.stmt={c:c,d:docsOf(c,A)};$('mCust').classList.remove('on');if(S.mode!=='s')S.prev=S.mode;setMode('s');sDraw();window.scrollTo(0,0)}
+async function sOpen(id){const c=CU.get()[id];if(!c)return;toast('جارٍ تجهيز كشف الحساب...');const A=await loadAll();S.sheetFn=null;S.stmt={c:c,d:docsOf(c,A)};if(S.mode!=='s')S.prev=S.mode;setMode('s');sDraw();window.scrollTo(0,0)}
 $('cur').addEventListener('input',calc);
 
 /* ===== الشحنات: شحنة واحدة لعدة عملاء، لكل عميل حمولة وفاتورة وتسليم ===== */
@@ -1029,7 +1057,7 @@ function shEdit(code,cid){const h=SHS.get()[code];if(!h)return;SH=JSON.parse(JSO
 function shFill(){$('shLst').style.display='none';$('shEd').style.display='';$('sh_nd').value='';
   const m={code:'code',mode:'mode',bl:'bl',cont:'cont',car:'car',from:'from',to:'to',sd:'sd',eta:'eta',fr:'freight',cur:'cur',notes:'notes'};
   Object.keys(m).forEach(k=>$('sh_'+k).value=SH[m[k]]||'');$('sh_code').readOnly=!SH._new;SH.dlOpen=-1;Object.keys(SHN0).forEach(k=>delete SHN0[k]);SH.cons.forEach(c=>SHN0[c.id]=c.cust);shRender()}
-function shRender(){shStep();shConsDraw();shUpd();shDlDraw();shCostDraw();shProfDraw();shCloseBox();shLockUI()}
+function shRender(){shStep();shFlow();shConsDraw();shUpd();shDlDraw();shCostDraw();shProfDraw();shCloseBox();shLockUI()}
 function shStep(){const cur=shStat(SH),hist=SH.hist||[];$('shTitle').textContent=SH.code||'شحنة جديدة';$('shTitleSt').innerHTML=shBadge(cur)+(SH.posted?' <span class="bd s-paid">🔒 مُرحَّلة</span>':'');$('shStep').innerHTML=SHST.map(([k,n])=>{const hh=hist.find(x=>x.st===k),idx=SHST.findIndex(x=>x[0]===cur),ki=SHST.findIndex(x=>x[0]===k);
   return `<div class="stp ${k===cur?'now':ki<idx?'done':''}"><b>${ki<idx?'✓ ':''}${n}</b><small>${hh?(k!=='dn'&&can('ship')?`<input type="date" class="stpd" data-sd="${k}" value="${esc(hh.date||'')}" title="تعديل تاريخ هذه المرحلة">`:esc(hh.date)):(k==='dn'?(SH.cons.filter(c=>dlKey(c)==='full').length+' من '+SH.cons.length+' حمولة'):'—')}</small></div>`}).join('');
   if(!$('sh_nd').value)$('sh_nd').value=shToday();const i=['ld','tr','ar','cu'].indexOf(SH.st==='dn'?'cu':SH.st);$('sh_prev').style.display=i>0?'':'none';$('sh_next').style.display=i<3?'':'none';
@@ -1389,7 +1417,7 @@ function applyPerms(){PERMS.forEach(([p])=>document.body.classList.toggle('np-'+
   $('uChip').textContent=ME?ME.name:'';$('uMenuName').textContent=ME?ME.name+(ME.admin?' (مدير)':''):'';
   $('bBackup').style.display=(can('backup')||can('reset'))?'':'none';$('sh_save').style.display=(can('ship')||can('cost'))?'':'none';
   document.querySelector('.rzBox').style.display=can('reset')?'':'none';
-  if((S.mode==='i'&&!can('inv'))||(S.mode==='r'&&!can('rc'))||(S.mode==='s'&&!can('cust')&&!S.sheetFn))setMode('h');if(S.mode==='h')shDraw()}
+  if((S.mode==='i'&&!can('inv'))||(S.mode==='r'&&!can('rc'))||(S.mode==='s'&&!can('cust')&&!S.sheetFn)||(S.mode==='a'&&!can('inv')&&!can('rc'))||(S.mode==='c'&&!can('cust')))setMode('h');$('tabA').style.display=(can('inv')||can('rc'))?'':'none';if(S.mode==='h')shDraw()}
 function lgMode(setup){$('lgNameL').style.display=setup?'':'none';$('lgPass2L').style.display=setup?'':'none';$('lgCloud').style.display=setup?'':'none';
   $('lgT').textContent=setup?'إنشاء حساب المدير':'تسجيل الدخول';$('lgSub').textContent=setup?'أول تشغيل: أنشئ حساب المدير، ومنه تضيف باقي المستخدمين وصلاحياتهم.':'نظام إدارة الشحنات والفواتير';
   $('lgGo').textContent=setup?'إنشاء الحساب والدخول':'دخول';$('lgPass').autocomplete=setup?'new-password':'current-password';$('lgForm').dataset.setup=setup?'1':''}
@@ -1400,7 +1428,7 @@ let REMEMBERED=false;
 function remOk(){const r=LS.get('pst_rem',null);if(!r||!r.until||r.until<Date.now())return null;const u=US.get()[r.id];return u&&u.active!==false&&String(u.hash||'').slice(0,16)===r.fp?u:null}
 function enter(u,first,restored){ME=u;sessionStorage.setItem('pst_sess',u.id);
   if(!restored){if($('lgRem').checked){LS.set('pst_rem',{id:u.id,fp:String(u.hash||'').slice(0,16),until:Date.now()+30*864e5});localStorage.setItem('pst_lgu',u.user)}else{localStorage.removeItem('pst_rem');localStorage.removeItem('pst_lgu')}}
-  REMEMBERED=!!remOk();document.body.classList.remove('out');$('login').style.display='none';LG_FAIL=0;applyPerms();logAct(first?'إنشاء حساب المدير':'دخول','');idleReset();shOpen();syncUsers().then(()=>qFlush());qBadge()}
+  REMEMBERED=!!remOk();document.body.classList.remove('out');$('login').style.display='none';LG_FAIL=0;applyPerms();logAct(first?'إنشاء حساب المدير':'دخول','');idleReset();landing();syncUsers().then(()=>qFlush());qBadge()}
 function logout(why){if(ME)logAct('خروج',why||'');sessionStorage.removeItem('pst_sess');localStorage.removeItem('pst_rem');REMEMBERED=false;showLogin(why||'')}
 function idleReset(){clearTimeout(IDLE_T);if(ME&&!REMEMBERED)IDLE_T=setTimeout(()=>logout('انتهت الجلسة لعدم النشاط — سجّل الدخول من جديد'),30*60*1000)}
 ['click','keydown','touchstart'].forEach(ev=>document.addEventListener(ev,()=>{if(ME)idleReset()},true));
@@ -1507,7 +1535,7 @@ document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='z'&&
 $('bAdd').addEventListener('click',()=>{S.rows.push({});render()});
 $('bCols').addEventListener('click',()=>{colPanel();presets();open_('mCols')});
 $('bSave').addEventListener('click',saveInv);
-$('bList').addEventListener('click',()=>{listInv();open_('mList')});
+$('bList').addEventListener('click',()=>{ACT='i';setMode('a')});
 $('orient').addEventListener('change',e=>setLand(e.target.value==='l'));
 $('bReset').addEventListener('click',e=>{const b=e.currentTarget;if(b.dataset.arm){b.dataset.arm='';b.textContent='فاتورة جديدة';pushUndo();newInv()}else{b.dataset.arm='1';b.textContent='اضغط للتأكيد';setTimeout(()=>{b.dataset.arm='';b.textContent='فاتورة جديدة'},3000)}});
 $('rows').addEventListener('input',e=>{const t=e.target;if(t.dataset.k){S.rows[t.dataset.i][t.dataset.k]=t.value;calc()}});
@@ -1538,7 +1566,7 @@ $('preset').addEventListener('click',e=>{const d=(e.target.closest('button')||{}
 $('invList').addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;
   if(b.dataset.o||b.dataset.c){const k=b.dataset.o||b.dataset.c;try{const d=await fetchInv(k);load(d);
     if(b.dataset.c){S.opened='';$('code').value=nextCode();if(CL.u())api('next').then(j=>{$('code').value=j.code}).catch(()=>{});$('date').value=todayStr();$('st').value='draft';$('paid').value='';$('due').value='';S.ul='';setILock(false);calc();msg('تم نسخ الفاتورة — عدّلها ثم احفظها')}else S.opened=k;
-    $('mList').classList.remove('on')}catch(er){msg('تعذر فتح الفاتورة: '+er.message)}}
+    setMode('i')}catch(er){msg('تعذر فتح الفاتورة: '+er.message)}}
   else if(b.dataset.x){if(!need('inv_cancel'))return;const k=b.dataset.x,dd=LISTD[k]||LS.get('pst_inv',{})[k]||{};
     if((dd.st||'draft')!=='draft'){msg('لا تُحذف فاتورة صادرة — استخدم الإلغاء');return}
     if(b.dataset.arm){try{if(cloudList)await api('del',{code:k});const D=LS.get('pst_inv',{});delete D[k];LS.set('pst_inv',D)}catch(er){msg(er.message)}listInv()}else{b.dataset.arm=1;b.textContent='تأكيد حذف المسودة؟'}}
@@ -1566,20 +1594,20 @@ $('stampFile').addEventListener('change',e=>{const fl=e.target.files[0];if(!fl)r
 $('wm').src=document.querySelector('header img').src;
 $('bShare').addEventListener('click',sharePdf);
 window.addEventListener('resize',fitZoom);window.addEventListener('beforeprint',fitPrint);window.addEventListener('afterprint',afterPrintFix);refreshProds();
-$('tabH').addEventListener('click',shOpen);$('tabI').addEventListener('click',()=>setMode('i'));$('tabR').addEventListener('click',()=>setMode('r'));
+$('tabH').addEventListener('click',shOpen);$('tabA').addEventListener('click',()=>setMode('a'));$('tabC').addEventListener('click',cOpen);$('tabI').addEventListener('click',()=>setMode('i'));$('tabR').addEventListener('click',()=>setMode('r'));
 ['input','change'].forEach(ev=>$('rform').addEventListener(ev,rdraw));
 ['input','change'].forEach(ev=>$('r_itb').addEventListener(ev,e=>{const k=e.target.dataset.f;if(k)R.items[e.target.closest('.cr').dataset.i][k]=e.target.value}));
 $('r_itb').addEventListener('click',e=>{const b=e.target.closest('[data-rm]');if(!b)return;R.items.splice(+b.dataset.rm,1);if(!R.items.length)R.items.push({});ritems();rdraw()});
 $('r_additem').addEventListener('click',()=>{R.items.push({});ritems();rdraw()});
 $('r_invinfo').addEventListener('click',e=>{const b=e.target.closest('#r_fill');if(!b)return;rid('amt').value=b.dataset.rm;if(b.dataset.cur)rid('cur').value=b.dataset.cur;if(!rv('for'))rid('for').value='دفعة عن الفاتورة '+rv('inv');rdraw()});
 $('bRSave').addEventListener('click',rsave);
-$('bRList').addEventListener('click',()=>{rlist();open_('mRList')});
+$('bRList').addEventListener('click',()=>{ACT='r';setMode('a')});
 $('rq').addEventListener('input',rdrawList);
 $('bRNew').addEventListener('click',e=>{const b=e.currentTarget;if(b.dataset.arm){b.dataset.arm='';b.textContent='وصل جديد';rnew()}else{b.dataset.arm='1';b.textContent='اضغط للتأكيد';setTimeout(()=>{b.dataset.arm='';b.textContent='وصل جديد'},3000)}});
 $('rList').addEventListener('click',async e=>{const b=e.target.closest('button'),k=b&&(b.dataset.o||b.dataset.c);if(!k)return;
   try{const d=rCloud?(await api('rget',{code:k})).d:RLISTD[k];rload(d);R.opened=k;
     if(b.dataset.c){R.opened='';R.applied=false;rid('void').checked=false;rid('no').value=rnextNo();if(CL.u())api('rnext').then(j=>{rid('no').value=j.code;rdraw()}).catch(()=>{});rid('date').value=todayStr();rdraw();msg('تم نسخ الوصل — عدّله ثم احفظه')}
-    $('mRList').classList.remove('on')}catch(er){msg('تعذر فتح الوصل: '+er.message)}});
+    setMode('r')}catch(er){msg('تعذر فتح الوصل: '+er.message)}});
 {const _l=load;load=function(d){_l(d);setClean('i',true)};const _n=newInv;newInv=function(){_n();setClean('i',false)};const _rl=rload;rload=function(d){_rl(d);setClean('r',true)};const _rn=rnew;rnew=function(){_rn();setClean('r',false)}}
 ['input','change'].forEach(ev=>document.addEventListener(ev,e=>{const t=e.target;if(!t.closest)return;const f=t.closest('.bad');if(f){f.classList.remove('bad');const x=f.querySelector('.fe');x&&x.remove()}
   if(t.closest('#iwrap,#rwrap')&&!['foot','r_page'].includes(t.id))markDirty()}));
@@ -1588,13 +1616,63 @@ document.addEventListener('click',e=>{if(e.target.closest('#rows button,#r_addit
 function closeMenu(){$('moreMenu').hidden=true;$('bMore').setAttribute('aria-expanded','false')}
 $('bMore').addEventListener('click',()=>{const m=$('moreMenu');m.hidden=!m.hidden;$('bMore').setAttribute('aria-expanded',String(!m.hidden))});
 $('moreMenu').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.id==='bReset'||b.id==='bRNew'){if(!b.dataset.arm)closeMenu()}else closeMenu()});
-$('bConn').addEventListener('click',()=>{open_('mList');document.querySelector('#mList details:last-of-type').open=true;listInv()});
+$('bSettings').addEventListener('click',()=>{closeMenu();setMode('g')});$('gReset').addEventListener('click',()=>{$('bBackup').click();setTimeout(()=>{const r=document.querySelector('.rzBox');r&&r.scrollIntoView({block:'center'})},60)});
 document.addEventListener('keydown',e=>{
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();if(S.mode==='h'){if($('shEd').style.display!=='none')shSave()}else if(S.mode!=='s')(S.mode==='r'?rsave:saveInv)()}
   if(e.key==='Escape'){closeMenu();document.querySelectorAll('.modal.on').forEach(m=>m.classList.remove('on'))}});
 window.addEventListener('beforeunload',e=>{if(DIRTY.i||DIRTY.r){e.preventDefault();e.returnValue=''}});
 {const dz=document.createElement('div');dz.className='dz';dz.innerHTML='<h3 class="shH" style="color:#c0392b">منطقة الخطر</h3><p class="hint" style="margin:0 0 8px">حذف الشحنة نهائي ولا يمكن التراجع عنه.</p>';dz.appendChild($('sh_del'));$('shEd').appendChild(dz)}
 {const hi=document.querySelector('header img');if(hi)$('brandImg').src=hi.src}
+/* ===== هيكلة التنقل: المحاسبة / العملاء / الإعدادات ===== */
+{const mvAll=(sel,to,pick)=>{const m=document.querySelector(sel),mp=m.querySelector('.mp'),ch=[...mp.children].filter(c=>!c.classList.contains('mh'));ch.forEach((c,i)=>{const t=pick?pick(c,i):to;t.appendChild(c)});m.remove()};
+  mvAll('#mList',$('aInvBody'),(c,i)=>(c.tagName==='DETAILS'?(c.querySelector('#vtxt')?$('gDat'):$('gConn')):$('aInvBody')));
+  mvAll('#mRList',$('aRcBody'));mvAll('#mCust',$('cBody'));
+  const nm=(el,to)=>{if(!el)return;el.classList.remove('inv-only');to.appendChild(el)};
+  nm($('bCols'),$('gInv'));nm($('orient').closest('label'),$('gInv'));nm($('showBank').closest('.inv-only')||$('showBank').closest('div.opts').parentElement,$('gInv'));nm(document.querySelector('label.lb[data-pm=settings]'),$('gInv'));
+  nm($('bUsers'),$('gUsr'));nm($('bLog'),$('gUsr'));nm($('bAudit'),$('gDat'));nm($('bBackup'),$('gDat'));
+  [...document.querySelectorAll('#moreMenu .mh2')].forEach(h=>{if(h.textContent.trim()==='الإعدادات'||(!h.nextElementSibling))h.remove()});
+  $('bBackup').textContent='نسخة احتياطية واستيراد';
+  $('aNewInv').addEventListener('click',()=>{if(!need('inv'))return;setMode('i');newInv()});$('aNewRc').addEventListener('click',()=>{if(!need('rc'))return;setMode('r');rnew()});
+  $('aTI').addEventListener('click',()=>{ACT='i';accTab('i')});$('aTR').addEventListener('click',()=>{ACT='r';accTab('r')})}
+let ACT='i';
+function accTab(t){ACT=t;$('aTI').classList.toggle('on',t==='i');$('aTR').classList.toggle('on',t==='r');$('aInvP').style.display=t==='i'?'':'none';$('aRcP').style.display=t==='r'?'':'none';$('aNewInv').style.display=t==='i'&&can('inv')?'':'none';$('aNewRc').style.display=t==='r'&&can('rc')?'':'none'}
+function accInit(){if(ACT==='i'&&!can('inv')&&can('rc'))ACT='r';if(ACT==='r'&&!can('rc')&&can('inv'))ACT='i';$('aTI').style.display=can('inv')?'':'none';$('aTR').style.display=can('rc')?'':'none';accTab(ACT);
+  Promise.all([can('inv')?listInv():0,can('rc')?rlist():0]).then(()=>{if(S.mode==='a')accKpi()})}
+function accKpi(){const I=LISTD||{},Rc=RLISTD||{},un={};let n=0,dr=0,mo={},rm=0;const ym=todayStr().slice(0,7);
+  Object.keys(I).forEach(k=>{const d=I[k],st=d.st||'draft';if(st==='draft')dr++;else if(st!=='paid'&&st!=='void'){const r=num(d.t)-num(d.pd);if(r>.004){n++;un[d.cur||'']=(un[d.cur||'']||0)+r}}});
+  Object.keys(Rc).forEach(k=>{const d=Rc[k];if(d.st==='void'||!String(d.date||'').startsWith(ym))return;rm++;mo[d.cur||'']=(mo[d.cur||'']||0)+num(d.t)});
+  const e=o=>Object.entries(o).map(([c,v])=>fm(v,esc(c))).join(' · ')||'0';
+  $('aKpi').innerHTML=(can('inv')?`<div class="k bad"><span>غير محصّل</span><b>${e(un)}</b><small>من الفواتير الصادرة</small></div><div class="k"><span>فواتير غير مسدّدة</span><b>${n}</b><small>مرسلة أو مدفوعة جزئياً</small></div><div class="k"><span>مسودات</span><b>${dr}</b><small>لم تُصدر بعد</small></div>`:'')+(can('rc')?`<div class="k good"><span>مقبوضات هذا الشهر</span><b>${e(mo)}</b><small>${rm} وصل</small></div>`:'')}
+function landing(){const l=LS.get('pst_land','');
+  if(l==='a'&&(can('inv')||can('rc'))){setMode('a');return}
+  if(l==='c'&&can('cust')){setMode('c');return}
+  if(!l&&!can('ship')&&!can('deliver')&&(can('inv')||can('rc'))){setMode('a');return}
+  shOpen()}
+/* ===== مسار العمل داخل الشحنة ===== */
+function shFlow(){const box=$('shFlow');if(!box)return;if(!SH||SH._new||!SH.code){box.innerHTML='';return}
+  const cons=SH.cons||[],hasC=cons.length>0,posted=!!SH.posted,inv=hasC&&cons.every(c=>consInvs(SH,c).length>0),dn=shStat(SH)==='dn';
+  const st=[['cm','١. أضف الحمولات',hasC,'إدارة الحمولات','can:ship'],['po','٢. رحّل الشحنة',posted,'اذهب لزر الترحيل','can:post'],['iv','٣. أصدر الفواتير',inv,'الحمولات بلا فاتورة','can:inv'],['dl','٤. سلّم الحمولات',dn,'تسجيل التسليم','can:deliver']];
+  const cur=st.findIndex(x=>!x[2]);
+  box.innerHTML=st.map((x,i)=>`<div class="fl ${x[2]?'done':i===cur?'now':''}"><b>${x[2]?'✓ ':''}${x[1]}</b>${i===cur&&can(x[4].slice(4))?`<button class="b1" data-fl="${x[0]}" type="button">${x[3]}</button>`:`<small>${x[2]?'تم':i===cur?'بانتظار من يملك الصلاحية':'لاحقاً'}</small>`}</div>`).join('')}
+{const fb=$('shFlow');if(fb)fb.addEventListener('click',e=>{const b=e.target.closest('[data-fl]');if(!b)return;const k=b.dataset.fl,fl=el=>{if(!el)return;el.scrollIntoView({block:'center',behavior:'smooth'});el.style.outline='3px solid var(--teal)';setTimeout(()=>el.style.outline='',1800)};
+  if(k==='cm')$('sh_cm').click();else if(k==='po')fl($('sh_post'));else{fl($('shCons'));toast(k==='iv'?'اضغط «فاتورة» في صف كل حمولة لا فاتورة لها':'اضغط «تسليم» في صف الحمولة المراد تسليمها')}})}
+/* ===== بحث عام ===== */
+function gsGo(t,id){$('gsBox').hidden=true;$('gs').value='';
+  if(t==='sh'){setMode('h');shEdit(id)}
+  else if(t==='iv'){(async()=>{try{const d=CL.u()?(await api('get',{code:id})).d:lsInv()[id];if(!d)throw new Error('غير موجودة');setMode('i');load(d);S.opened=id}catch(e){toast('تعذر فتح الفاتورة: '+e.message,'err')}})()}
+  else if(t==='rc'){(async()=>{try{const d=CL.u()?(await api('rget',{code:id})).d:RCL()[id];if(!d)throw new Error('غير موجود');setMode('r');rload(d);R.opened=id}catch(e){toast('تعذر فتح الوصل: '+e.message,'err')}})()}
+  else if(t==='cu')sOpen(id)}
+function gsDo(){const q=nk($('gs').value),box=$('gsBox');if(q.length<2){box.hidden=true;return}
+  const G=[],lim=6,hit=s=>nk(s).includes(q);
+  if(can('ship')||can('deliver')){const L=Object.values(SHS.get()).filter(h=>hit([h.code,h.bl,h.cont,h.car,h.from,h.to,(h.cons||[]).map(c=>c.cust+' '+c.goods).join(' ')].join(' '))).slice(0,lim);if(L.length)G.push(['الشحنات',L.map(h=>['sh',h.code,h.code,[(h.bl||''),(h.cons||[]).map(c=>c.cust).slice(0,2).join('، ')].filter(Boolean).join(' · ')])])}
+  if(can('inv')){const I=Object.assign({},lsInv(),ALL&&ALL.I||{}),L=Object.keys(I).filter(k=>hit(k+' '+(I[k].rcv||''))).slice(0,lim);if(L.length)G.push(['الفواتير',L.map(k=>['iv',k,k,(I[k].rcv||'')+' · '+fm(num(I[k].t),I[k].cur||'')])])}
+  if(can('rc')){const Rc=Object.assign({},RCL(),ALL&&ALL.Rc||{}),L=Object.keys(Rc).filter(k=>hit(k+' '+(Rc[k].rcv||''))).slice(0,lim);if(L.length)G.push(['الوصولات',L.map(k=>['rc',k,k,(Rc[k].rcv||'')+' · '+fm(num(Rc[k].t),Rc[k].cur||'')])])}
+  if(can('cust')){const C=Object.values(CU.get()).filter(c=>hit([c.name,(c.aliases||[]).join(' '),c.phone].join(' '))).slice(0,lim);if(C.length)G.push(['العملاء',C.map(c=>['cu',c.id,c.name,c.phone||'كشف الحساب'])])}
+  box.innerHTML=G.length?G.map(([h,L])=>`<div class="gsH">${h}</div>`+L.map(x=>`<button class="gsI" type="button" data-gt="${x[0]}" data-gi="${esc(x[1])}"><span dir="auto">${esc(x[2])}</span><small>${esc(x[3])}</small></button>`).join('')).join(''):'<div class="gsE">لا نتائج مطابقة</div>';box.hidden=false}
+{let gt;$('gs').addEventListener('input',()=>{clearTimeout(gt);gt=setTimeout(gsDo,120)});$('gs').addEventListener('focus',()=>{if($('gs').value)gsDo()});
+  $('gsBox').addEventListener('click',e=>{const b=e.target.closest('[data-gt]');if(b)gsGo(b.dataset.gt,b.dataset.gi)});
+  document.addEventListener('click',e=>{if(!e.target.closest('.gsw'))$('gsBox').hidden=true});
+  document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('gs').focus();$('gs').select()}else if(e.key==='Escape'&&document.activeElement===$('gs')){$('gsBox').hidden=true;$('gs').blur()}})}
 (async()=>{if(!/^https?:$/.test(location.protocol))return;try{const r=await fetch('/api',{cache:'no-store'}),j=await r.json();if(!j||j.app!=='portist')return;
   if(!CL.u())$('lgUrl').value='/api';
   if(!Object.keys(US.get()).length){$('lgCloud').open=true;if(j.users)$('lgErr').textContent='يوجد حساب على الخادم: سجّل الدخول من هذا القسم (لا تنشئ حساباً جديداً). اكتب كلمة سر الربط واسم الدخول وكلمة السر ثم اضغط «دخول عبر الخادم».'}}catch(e){}})();
@@ -1606,8 +1684,8 @@ $('cq').addEventListener('input',cDraw);
 $('cList').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const d=b.dataset;
   if(d.st)sOpen(d.st);
   else if(d.ed)cEdit(d.ed);
-  else if(d.ni){const c=CU.get()[d.ni];if(!c||!guardNew(b,'i'))return;$('mCust').classList.remove('on');setMode('i');newInv();$('rcv').value=c.name;calc()}
-  else if(d.nr){const c=CU.get()[d.nr];if(!c||!guardNew(b,'r'))return;$('mCust').classList.remove('on');setMode('r');rnew();rid('from').value=c.name;rid('phone').value=c.phone||'';rdraw()}});
+  else if(d.ni){const c=CU.get()[d.ni];if(!c||!guardNew(b,'i'))return;setMode('i');newInv();$('rcv').value=c.name;calc()}
+  else if(d.nr){const c=CU.get()[d.nr];if(!c||!guardNew(b,'r'))return;setMode('r');rnew();rid('from').value=c.name;rid('phone').value=c.phone||'';rdraw()}});
 S.lang=LS.get('pst_lang','ar');setLang(S.lang);setLand(false);newInv();rnew();upd();authStart();
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-cf]');if(b)cfDo(b.dataset.cf);if(e.target.closest&&e.target.closest('#qBadge')){const Q=Object.values(QS.get()).filter(x=>x.err);if(Q.length)toast('بانتظار تدخلك: '+Q.map(x=>x.code+' — '+x.err).join(' | '),'err');qFlush(true)}});
 </script>
