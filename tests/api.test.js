@@ -80,6 +80,14 @@ const { makeHandler } = require('../lib/core');
   ck('shnext SH-0002', (await call({ a: 'shnext', ...A })).code === 'SH-0002');
   const par = await Promise.all([1, 2, 3].map(i => call({ a: 'shsave', code: 'SH-0007', isNew: true, d: Object.assign({}, base, { code: 'SH-0007' }), ...A })));
   ck('concurrent create: exactly one wins', par.filter(x => x.ok).length === 1 && par.filter(x => x.err === 'exists').length === 2);
+  // الدخول العادي بدون رمز ربط + تقييد المحاولات
+  ck('normal login/use needs NO link password', !!(await H.run({ a: 'ulogin', ...A })).user && !!(await H.run({ a: 'ulist', ...A })).items);
+  ck('wrong user hash without pw refused', !!(await H.run({ a: 'ulist', u: 'admin', uh: 'zzz' })).err);
+  await call({ a: 'usave', ...A, user: mkU('V', 'vic', 'hv', ['inv']) });
+  for (let i = 0; i < 8; i++) await H.run({ a: 'ulogin', u: 'vic', uh: 'bad' + i });
+  const lk = await H.run({ a: 'ulogin', u: 'vic', uh: 'hv' });
+  ck('lockout after 8 failures even with correct password', /محاولات/.test(lk.err || ''));
+  ck('lockout is per user (admin unaffected)', !!(await H.run({ a: 'ulogin', ...A })).user);
   // fail-open
   await sql('DELETE FROM users');
   ck('users table emptied after AUTH => refused (no fail-open)', !!(await call({ a: 'list' })).err);
