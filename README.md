@@ -37,3 +37,15 @@
 - المشروع صفحة ثابتة: الملف المنشور هو `public/index.html` (نسخة من `portist_invoice.html`، يولّدها `publish.sh`/`publish.bat`).
 - إعدادات Vercel: Framework = Other، Build Command فارغ، Output Directory = `public` (مضبوطة في `vercel.json`).
 - بعد كل تعديل: شغّل `sh publish.sh` ثم commit و push.
+
+## قاعدة البيانات على Vercel (Postgres / Neon)
+البنية: الواجهة ثابتة في `public/`، والخادم دالة واحدة `api/index.js` (منطقها في `lib/core.js`) فوق Postgres. نفس بروتوكول Code.gs، فلا تتغير الواجهة.
+
+إعداد مرة واحدة:
+1. في مشروع Vercel: Storage ← Create Database ← Neon (Postgres) ← اربطها بالمشروع. يضيف Vercel المتغير `DATABASE_URL` تلقائياً.
+2. Settings ← Environment Variables ← أضف `APP_PASSWORD` بقيمة كلمة سر الربط (طويلة وعشوائية). اختيارياً `PEPPER` (نص سري طويل) وإلا يُولَّد ويُحفظ في القاعدة.
+3. Redeploy. الجداول تُنشأ تلقائياً عند أول طلب.
+4. افتح الموقع على جهاز: يُعبَّأ رابط الخادم `/api` تلقائياً. أنشئ حساب المدير واكتب كلمة سر الربط في قسم «جهاز جديد؟…» قبل الضغط على «إنشاء».
+5. من أي جهاز آخر: افتح الموقع ← «جهاز جديد؟» ← كلمة سر الربط + اسم الدخول + كلمة السر.
+
+تشغيل محلي للتجربة: `npm install` ثم `PORT=8790 APP_PASSWORD=k node tests/devserver.js` (قاعدة في الذاكرة).

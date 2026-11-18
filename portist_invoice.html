@@ -376,11 +376,11 @@ body.mode-h #bPrint,body.mode-h #bShare{display:none}
 <label id="lgPass2L" style="display:none">تأكيد كلمة السر<input id="lgPass2" type="password" dir="ltr" autocomplete="new-password"></label>
 <button class="b1" id="lgGo" type="submit">دخول</button></div></form>
 <p class="lgerr" id="lgErr"></p>
-<details id="lgCloud"><summary>جهاز جديد؟ الدخول بحساب محفوظ في Google Sheets</summary><div>
-<label>رابط السكربت<input id="lgUrl" dir="ltr" placeholder="https://script.google.com/macros/s/.../exec"></label>
+<details id="lgCloud"><summary>جهاز جديد؟ الدخول بحساب محفوظ على الخادم</summary><div>
+<label>رابط الخادم<input id="lgUrl" dir="ltr" placeholder="/api  أو  https://script.google.com/macros/s/.../exec"></label>
 <label>كلمة سر الربط<input id="lgCpw" type="password" dir="ltr"></label>
 <p class="hint" style="text-align:start">اكتب اسم الدخول وكلمة السر في الأعلى، ثم اضغط الزر التالي.</p>
-<button class="b2" id="lgCloudGo" type="button">دخول عبر Google Sheets</button></div></details>
+<button class="b2" id="lgCloudGo" type="button">دخول عبر الخادم</button></div></details>
 </div></div>
 <div class="bar">
   <div class="brand"><img id="brandImg" alt=""><b>Portist Lojistik</b></div>
@@ -421,7 +421,7 @@ body.mode-h #bPrint,body.mode-h #bShare{display:none}
     <button id="bAudit" data-pm="audit">فحص التطابق المحاسبي</button>
     <button id="bBackup">نسخة احتياطية وتصفير البيانات</button>
     <label class="lb" data-pm="settings">رفع الختم<input type="file" id="stampFile" accept="image/*" hidden></label>
-    <button id="bConn" data-pm="settings">ربط Google Sheets</button>
+    <button id="bConn" data-pm="settings">ربط الخادم</button>
   </div>
 </div>
 <div class="wrap" id="iwrap"><div id="lockBar" style="display:none"><span>🔒 الفاتورة صادرة ومقفلة عن التعديل حفاظاً على تطابق السجلات. فُكَّ القفل فقط إن كنت تدرك أثر التعديل.</span><button class="b2" id="bUnlock" type="button">فك القفل</button></div>
@@ -544,13 +544,13 @@ body.mode-h #bPrint,body.mode-h #bShare{display:none}
 <div id="bkPreview" style="display:none"><h3 style="margin:12px 0 6px;font-size:11pt;color:var(--teal-d)">محتوى الملف</h3><div id="bkStats" class="hint" style="line-height:1.9"></div>
 <div class="bk-row"><button class="b1" id="bkMerge" type="button">دمج مع بياناتي (الأحدث يبقى)</button><button class="b3" id="bkReplace" type="button">استبدال كل البيانات</button></div>
 <p class="hint">الدمج يضيف ما ينقص ويُحدّث السجل الأقدم بالأحدث، ولا يحذف شيئاً. الاستبدال يمسح بيانات هذا الجهاز ويضع بيانات الملف مكانها.</p></div>
-<p class="hint" style="margin-top:10px">تنبيه: الملف يحتوي على رابط Google Sheets وكلمة سره إن كنتَ ضبطتهما، فلا تشاركه.</p>
+<p class="hint" style="margin-top:10px">تنبيه: الملف يحتوي على رابط الخادم وكلمة سره إن كنتَ ضبطتهما، فلا تشاركه.</p>
 <div class="rzBox"><h3>تصفير جميع البيانات</h3>
 <p style="margin:0 0 8px;line-height:1.9">يمسح من هذا الجهاز كل الفواتير والوصولات والعملاء والشحنات والأصناف المحفوظة، ويعيد الترقيم إلى 0001. <b>لا يمكن التراجع عنه.</b> تُنزَّل نسخة احتياطية تلقائياً قبل المسح.</p>
 <p class="hint" id="rzInfo"></p>
 <label class="chk"><input type="checkbox" id="rzSet"> تصفير الإعدادات أيضاً (الأعمدة، التذييل، الختم، القوالب، اللغة)</label>
-<label class="chk" id="rzCloudL" style="display:none"><input type="checkbox" id="rzCloud" checked> فصل الربط مع Google Sheets على هذا الجهاز</label>
-<p class="hint" id="rzCloudN" style="display:none">البيانات المخزنة في Google Sheets نفسها لا تُمسح من هنا. إن أبقيت الربط ستعود للظهور من الجدول. لتصفيرها امسح صفوف أوراق Invoices وReceipts وShipments من الجدول يدوياً.</p>
+<label class="chk" id="rzCloudL" style="display:none"><input type="checkbox" id="rzCloud" checked> فصل الربط مع الخادم على هذا الجهاز</label>
+<p class="hint" id="rzCloudN" style="display:none">البيانات المخزنة على الخادم نفسها لا تُمسح من هنا. إن أبقيت الربط ستعود للظهور من الجدول. لتصفيرها امسح صفوف أوراق Invoices وReceipts وShipments من الجدول يدوياً.</p>
 <div class="bk-row"><input id="rzWord" placeholder="اكتب كلمة: تصفير" autocomplete="off" style="border:1px solid var(--line);border-radius:10px;padding:9px 12px;font:inherit;width:170px"><button class="b3" id="rzGo" type="button" disabled>تصفير البيانات نهائياً</button></div></div></div></div>
 <div class="modal" id="mUsers"><div class="mp mid"><div class="mh"><b>المستخدمون والصلاحيات</b><button class="b2" data-close>إغلاق</button></div>
 <div id="uLst"><div class="flt"><span class="hint" style="flex:1">لكل مستخدم اسم دخول وكلمة سر وصلاحيات يحددها المدير بالتفصيل.</span><button class="b1" id="uNew" type="button">+ مستخدم جديد</button></div><div id="uList"></div></div>
@@ -570,8 +570,8 @@ body.mode-h #bPrint,body.mode-h #bShare{display:none}
 <div class="modal" id="mList"><div class="mp mid"><div class="mh"><b>الفواتير المحفوظة</b><button class="b2" data-close>إغلاق</button></div><div class="flt"><input id="q" type="search" placeholder="بحث بالكود أو اسم المستلم"><select id="fst"><option value="">كل الحالات</option><option value="draft">مسودة</option><option value="sent">مرسلة</option><option value="partial">مدفوعة جزئياً</option><option value="paid">مدفوعة</option><option value="void">ملغاة</option></select><b id="unpaid"></b></div>
 <details><summary style="cursor:pointer;font-weight:700;padding:6px 0">التحقق من فاتورة (نص QR)</summary><div class="cr"><input id="vtxt" dir="ltr" placeholder="الصق نص رمز QR" style="min-width:260px"><button class="b2" id="vbtn">تحقق</button></div></details>
 <div id="invList"></div>
-<details style="margin-top:10px"><summary style="cursor:pointer;font-weight:700">ربط Google Sheets (لعرض الفواتير من أي جهاز)</summary>
-<div class="cr"><input id="cUrl" dir="ltr" placeholder="رابط Apps Script — ينتهي بـ /exec" style="min-width:250px"><input id="cPw" type="password" placeholder="كلمة السر"><button class="b1" id="cSave">حفظ وتجربة الاتصال</button></div></details>
+<details style="margin-top:10px"><summary style="cursor:pointer;font-weight:700">ربط الخادم (لعرض البيانات من أي جهاز)</summary>
+<div class="cr"><input id="cUrl" dir="ltr" placeholder="رابط الخادم: /api (أو رابط Apps Script)" style="min-width:250px"><input id="cPw" type="password" placeholder="كلمة السر"><button class="b1" id="cSave">حفظ وتجربة الاتصال</button></div></details>
 <p class="hint" id="cHint"></p>
 <p class="hint">بدون ربط، تُحفظ الفواتير في هذا المتصفح وعلى هذا الجهاز فقط.</p></div></div>
 <datalist id="prods"></datalist>
@@ -754,7 +754,7 @@ async function qFlush(manual){if(QBUSY||!CL.u()||!ME)return;QBUSY=true;let done=
       if(x.a==='shsave'&&j.ver!=null){const D=SHS.get();if(D[x.code]){D[x.code].ver=j.ver;SHS.set(D)}if(SH&&SH.code===x.code)SH.ver=j.ver}}
     catch(e){if(e.net)break;const Q2=QS.get();if(Q2[k]){Q2[k].err=e.message==='conflict'?'تعارض: عُدّلت هذه الشحنة من جهاز آخر':e.message==='exists'?'الرقم مستخدم لسجل آخر على السيرفر':e.message;QS.set(Q2)}fail.push(x.code+': '+(e.message==='conflict'?'تعارض مع تعديل من جهاز آخر':e.message))}}
   }finally{QBUSY=false;qBadge()}
-  if(done)toast('تمت مزامنة '+done+' عنصر مع Google Sheets');
+  if(done)toast('تمت مزامنة '+done+' عنصر مع الخادم');
   if(fail.length&&manual)toast('تعذّرت مزامنة: '+fail.join(' | '),'err')}
 document.addEventListener('DOMContentLoaded',()=>{});
 window.addEventListener('online',()=>qFlush());setInterval(()=>qFlush(),60000);
@@ -762,12 +762,12 @@ async function saveInv(){if(!need('inv'))return;if(ILOCK){toast('الفاتور�
   const d=JSON.parse(JSON.stringify(snap())),D=LS.get('pst_inv',{});const PR=LS.get('pst_prod',{});S.rows.forEach(r=>{if(r.name&&r.name.trim()){const o=Object.assign({},r);delete o.name;PR[r.name.trim()]=o}});LS.set('pst_prod',PR);refreshProds();D[code]=d;if(!LS.set('pst_inv',D)){msg('لم تُحفظ الفاتورة: مساحة التخزين ممتلئة');return}
   const m=code.match(/^PST-(\d+)$/i);if(m&&+m[1]>LS.get('pst_seq',0))LS.set('pst_seq',+m[1]);
   const lockAfter=()=>{if(($('st').value||'draft')!=='draft')setILock(true)};if(!CL.u()){S.opened=code;setClean('i',true);lockAfter();logAct('حفظ فاتورة',code+' · '+$('st').value);msg('تم الحفظ على هذا الجهاز فقط: '+code);return}
-  msg('جارٍ الحفظ في Google Sheets...');
-  try{await api('save',{code:code,d:d,isNew:code!==S.opened});S.opened=code;setClean('i',true);lockAfter();logAct('حفظ فاتورة',code+' · '+$('st').value);msg('تم الحفظ في Google Sheets: '+code)}
-  catch(e){if(e.message==='exists')bad($('code'),'الكود مستخدم لفاتورة أخرى — غيّره ثم احفظ');else{if(e.net){qAdd('save',code,{d:d,isNew:code!==S.opened});S.opened=code;setClean('i',true);lockAfter()}msg('تعذر الاتصال بـ Sheets ('+e.message+') — حُفظت نسخة على هذا الجهاز'+(e.net?' وستُرسل تلقائياً عند عودة الاتصال':''))}}}
+  msg('جارٍ الحفظ على الخادم...');
+  try{await api('save',{code:code,d:d,isNew:code!==S.opened});S.opened=code;setClean('i',true);lockAfter();logAct('حفظ فاتورة',code+' · '+$('st').value);msg('تم الحفظ على الخادم: '+code)}
+  catch(e){if(e.message==='exists')bad($('code'),'الكود مستخدم لفاتورة أخرى — غيّره ثم احفظ');else{if(e.net){qAdd('save',code,{d:d,isNew:code!==S.opened});S.opened=code;setClean('i',true);lockAfter()}msg('تعذر الاتصال بالخادم ('+e.message+') — حُفظت نسخة على هذا الجهاز'+(e.net?' وستُرسل تلقائياً عند عودة الاتصال':''))}}}
 let LISTD={};
 async function listInv(){let D=LS.get('pst_inv',{});cloudList=false;
-  if(CL.u()){$('invList').innerHTML='<p>جارٍ التحميل من Google Sheets...</p>';
+  if(CL.u()){$('invList').innerHTML='<p>جارٍ التحميل من الخادم...</p>';
     try{const j=await api('list');D={};j.items.forEach(x=>D[x.code]=x);cloudList=true}catch(e){msg('تعذر الاتصال: '+e.message+' — تُعرض فواتير هذا الجهاز')}}
   LISTD=D;drawList()}
 function drawList(){const q=$('q').value.trim().toLowerCase(),fs=$('fst').value,D=LISTD,un={};
@@ -865,9 +865,9 @@ async function rsave(){if(!need('rc'))return;if(rid('void').checked&&!need('rc_v
   const rem={};rAllocRows().forEach(x=>rem[x.code]=x.rem);
   for(const k of Object.keys(want)){if(rem[k]==null||want[k]>rem[k]+.004){toast('المبلغ الموزَّع على '+k+' أكبر من المتبقي فيها','err');return}}
   const D=RCL();let d=rsnap(),note='';
-  if(CL.u()){msg('جارٍ الحفظ في Google Sheets...');
+  if(CL.u()){msg('جارٍ الحفظ على الخادم...');
     try{await api('rsave',{code:no,d:d,isNew:no!==R.opened});R.opened=no}
-    catch(e){if(e.message==='exists'){bad(rid('no'),'الرقم مستخدم لوصل آخر — غيّره ثم احفظ');return}if(e.net)qAdd('rsave',no,{d:d,isNew:no!==R.opened});note=' (تعذر الاتصال بـ Sheets: '+e.message+(e.net?' — سيُرسل تلقائياً':'')+')'}}
+    catch(e){if(e.message==='exists'){bad(rid('no'),'الرقم مستخدم لوصل آخر — غيّره ثم احفظ');return}if(e.net)qAdd('rsave',no,{d:d,isNew:no!==R.opened});note=' (تعذر الاتصال بالخادم: '+e.message+(e.net?' — سيُرسل تلقائياً':'')+')'}}
   D[no]=d;LS.set('pst_rc',D);R.opened=no;const m=no.match(/^RC-(\d+)$/i);if(m&&+m[1]>LS.get('pst_rseq',0))LS.set('pst_rseq',+m[1]);
   const have=Object.assign({},R.alApplied),fin=Object.assign({},have);
   for(const k of new Set(Object.keys(want).concat(Object.keys(have)))){const dl=r2((want[k]||0)-(have[k]||0));if(Math.abs(dl)<.005)continue;
@@ -877,10 +877,10 @@ async function rsave(){if(!need('rc'))return;if(rid('void').checked&&!need('rc_v
   if(on.length)note+=' — وُزّعت على: '+on.map(k=>k+' ('+f(fin[k])+')').join('، ');
   const un=rcUn(d);if(un>.004)note+=' — رصيد دائن للعميل '+fm(un,rv('cur'));
   if(vd&&rv2.length)note+=' — عُكس أثر الوصل على الفواتير';
-  logAct(vd?'إلغاء وصل':'حفظ وصل',no+' · '+fm(amt,rv('cur')));refInv();rInvInfo();R.sig='';rAllocTick();setClean('r',true);msg('تم حفظ الوصل '+no+(CL.u()?' في Google Sheets':' على هذا الجهاز')+note)}
+  logAct(vd?'إلغاء وصل':'حفظ وصل',no+' · '+fm(amt,rv('cur')));refInv();rInvInfo();R.sig='';rAllocTick();setClean('r',true);msg('تم حفظ الوصل '+no+(CL.u()?' على الخادم':' على هذا الجهاز')+note)}
 let RLISTD={},rCloud=false;
 async function rlist(){let D=RCL();rCloud=false;
-  if(CL.u()){$('rList').innerHTML='<p>جارٍ التحميل من Google Sheets...</p>';try{const j=await api('rlist');D={};j.items.forEach(x=>D[x.code]=x);rCloud=true}catch(e){msg('تعذر الاتصال: '+e.message+' — تُعرض وصولات هذا الجهاز')}}
+  if(CL.u()){$('rList').innerHTML='<p>جارٍ التحميل من الخادم...</p>';try{const j=await api('rlist');D={};j.items.forEach(x=>D[x.code]=x);rCloud=true}catch(e){msg('تعذر الاتصال: '+e.message+' — تُعرض وصولات هذا الجهاز')}}
   RLISTD=D;rdrawList()}
 function rdrawList(){const q=$('rq').value.trim().toLowerCase(),D=RLISTD,ks=Object.keys(D).filter(k=>!q||(k+' '+(D[k].rcv||'')).toLowerCase().includes(q)).sort((a,b)=>D[b].ts-D[a].ts);
   const head='<div class="lsG lsR h"><span>الرقم</span><span>استلمنا من</span><span>التاريخ</span><span>المبلغ</span><span>الحالة</span><span></span></div>';
@@ -928,7 +928,7 @@ function ensureCust(n,ph){n=String(n||'').trim();if(!n)return;const D=CU.get(),c
 function refCust(){$('custs').innerHTML=Object.values(CU.get()).sort((a,b)=>a.name.localeCompare(b.name)).map(c=>`<option value="${esc(c.name)}">${esc(c.phone||'')}</option>`).join('')}
 let ALL=null;
 async function loadAll(){const I=Object.assign({},LS.get('pst_inv',{})),Rc=Object.assign({},RCL());
-  if(CL.u()){try{(await api('list')).items.forEach(x=>I[x.code]=Object.assign({},I[x.code]||{},x))}catch(e){msg('تعذر الاتصال بـ Sheets — تُعرض بيانات هذا الجهاز')}
+  if(CL.u()){try{(await api('list')).items.forEach(x=>I[x.code]=Object.assign({},I[x.code]||{},x))}catch(e){msg('تعذر الاتصال بالخادم — تُعرض بيانات هذا الجهاز')}
     try{(await api('rlist')).items.forEach(x=>Rc[x.code]=Object.assign({},Rc[x.code]||{},x))}catch(e){}
     const need=Object.keys(Rc).filter(k=>Rc[k].items===undefined);for(let i=0;i<need.length;i+=6)await Promise.all(need.slice(i,i+6).map(async k=>{try{Object.assign(Rc[k],(await api('rget',{code:k})).d,{code:k})}catch(e){}}))}
   return ALL={I:I,Rc:Rc}}
@@ -1109,7 +1109,7 @@ async function cfDo(k){const x=CFX;$('mConf').classList.remove('on');if(!x)retur
 function shDelete(){if(!need('ship_del'))return;const b=$('sh_del');if(SH._new){shShowList();return}if((SH.cons||[]).some(c=>(c.dl||[]).length)){toast('لا يمكن حذف شحنة فيها تسليمات مسجلة — سجلات التسليم وثائق','err');return}
   if(SH.posted){toast('الشحنة مُرحَّلة — ألغِ الترحيل أولاً ثم احذفها','err');return}
   {const AI=shAI(),ex=new Set();Object.keys(AI).forEach(k=>{const d=AI[k];if(d&&d.ship===SH.code&&d.st!=='void')ex.add(k)});(SH.cons||[]).forEach(c=>String(c.inv||'').split(/[,،\s]+/).filter(Boolean).forEach(k=>{const d=AI[k];if(d&&d.st!=='void')ex.add(k)}));if(ex.size){toast('لا يمكن حذف شحنة مرتبطة بفواتير ('+[...ex].slice(0,4).join('، ')+(ex.size>4?'…':'')+') — ألغِ الفواتير (إبطال) أو افصل ربطها أولاً','err');return}}if(!b.dataset.arm){b.dataset.arm='1';b.textContent='تأكيد حذف الشحنة؟';setTimeout(()=>{b.dataset.arm='';b.textContent='حذف الشحنة'},3500);return}
-  b.dataset.arm='';b.textContent='حذف الشحنة';const D=SHS.get();delete D[SH.code];SHS.set(D);if(CL.u()){const dc=SH.code;api('shdel',{code:dc}).catch(e=>toast('حُذفت محلياً وتعذّر حذفها من Sheets ('+e.message+') — قد تعود الشحنة عند التحديث','err'))}logAct('حذف شحنة',SH.code);toast('تم حذف الشحنة');shShowList();shDraw()}
+  b.dataset.arm='';b.textContent='حذف الشحنة';const D=SHS.get();delete D[SH.code];SHS.set(D);if(CL.u()){const dc=SH.code;api('shdel',{code:dc}).catch(e=>toast('حُذفت محلياً وتعذّر حذفها من الخادم ('+e.message+') — قد تعود الشحنة عند التحديث','err'))}logAct('حذف شحنة',SH.code);toast('تم حذف الشحنة');shShowList();shDraw()}
 /* التسليم */
 function shDlDraw(){const box=$('shDl'),i=SH.dlOpen;if(i==null||i<0||!SH.cons[i]){box.style.display='none';return}
   const c=SH.cons[i],left=Math.max(0,num(c.pk)-pkDone(c)),b=consBal(SH,c),due=balDue(b);box.style.display='';
@@ -1300,7 +1300,7 @@ function shTodo(all){const AI=shAI(),today=shToday(),G=[];
     if(st==='draft')dr.push({k:'inv:'+k,t:k+' — '+(d.rcv||'بدون مستلم'),s:'مسودة لم تُصدر · '+fm(num(d.t),d.cur||'')+(d.ship?' · '+iso(d.ship):''),d:d.date||''});
     else if((st==='sent'||st==='partial')&&d.due&&d.due<today&&num(d.t)-num(d.pd)>.004){const days=Math.floor((new Date(today)-new Date(d.due))/864e5);od.push({k:'inv:'+k,t:k+' — '+(d.rcv||''),s:'المتبقي '+fm(num(d.t)-num(d.pd),d.cur||'')+' · متأخرة '+days+' يوم',d:d.due})}});
   dr.sort((a,b)=>String(b.d).localeCompare(String(a.d)));od.sort((a,b)=>String(a.d).localeCompare(String(b.d)));
-  const bk=[];{const at=LS.get('pst_bk_at',0),cnt=Object.keys(AI).length+all.length;if(cnt>=3){const days=at?Math.floor((Date.now()-at)/864e5):null;if(days==null||days>=7)bk.push({k:'bk:1',t:days==null?'لم تُؤخذ نسخة احتياطية من قبل':'آخر نسخة احتياطية منذ '+days+' يوماً',s:'بياناتك محفوظة في هذا المتصفح فقط'+(CL.u()?' وفي Google Sheets':'')+' — صدّر نسخة من قائمة ⋯'})}}
+  const bk=[];{const at=LS.get('pst_bk_at',0),cnt=Object.keys(AI).length+all.length;if(cnt>=3){const days=at?Math.floor((Date.now()-at)/864e5):null;if(days==null||days>=7)bk.push({k:'bk:1',t:days==null?'لم تُؤخذ نسخة احتياطية من قبل':'آخر نسخة احتياطية منذ '+days+' يوماً',s:'بياناتك محفوظة في هذا المتصفح فقط'+(CL.u()?' وعلى الخادم':'')+' — صدّر نسخة من قائمة ⋯'})}}
   [['نسخة احتياطية',can('backup')?bk:[]],['حمولات بلا فاتورة صادرة',can('inv')?noInv:[]],['فواتير مستحقة متأخرة',can('inv')&&can('bal')?od:[]],['فواتير مسودة لم تُصدر',can('inv')?dr:[]],['شحنات وصلت ولم تُسلَّم',arr],['تكاليف غير مدفوعة للموردين',can('cost')?cost:[]]].forEach(([t,L])=>{if(L.length)G.push([t,L])});
   const tot=G.reduce((a,g)=>a+g[1].length,0);
   $('shTodo').innerHTML=`<h3 class="todoH">ما يحتاج إجراء ${tot?`<span class="n" style="background:#fdeaed;color:#c0334b;border-radius:999px;padding:1px 10px;font-size:9.5pt">${tot}</span>`:'<span class="ok">✓ لا يوجد ما ينتظر إجراء</span>'}</h3>`+(tot?'<div class="todo">'+G.map(([t,L])=>`<details${L.length<=4?' open':''}><summary><span>${t}</span><span class="n">${L.length}</span></summary>${L.slice(0,6).map(x=>`<button type="button" class="ti" data-tq="${esc(x.k)}">${esc(x.t)}<small>${esc(x.s)}</small></button>`).join('')}${L.length>6?`<div class="more">و${L.length-6} أخرى</div>`:''}</details>`).join('')+'</div>':'')}
@@ -1366,7 +1366,7 @@ $('rzGo').addEventListener('click',()=>{if(!need('reset'))return;const b=$('rzGo
   const keys=RZ_DATA.concat($('rzSet').checked?RZ_SET:[]).concat(CL.u()&&$('rzCloud').checked?RZ_CL:[]);
   keys.forEach(k=>localStorage.removeItem(k));logAct('تصفير البيانات',$('rzSet').checked?'مع الإعدادات':'البيانات فقط');toast('تم تصفير البيانات — يُعاد تحميل الصفحة');setTimeout(()=>location.reload(),has?1800:900)});
 /* ===== الدخول والصلاحيات ===== */
-const PERMS=[['ship','الشحنات: إنشاء وتعديل الشحنات والحمولات وتغيير الحالة'],['deliver','تسجيل تسليم الحمولات وطباعة وصولاته'],['ship_del','حذف الشحنات'],['post','ترحيل الشحنات وإلغاء الترحيل (قفل تعديل الحمولات)'],['bal','رؤية المبالغ المتبقية وأرصدة العملاء في الشحنات'],['cost','تكاليف الشحنة وأرباحها: عرض وتعديل'],['inv','الفواتير: إنشاء وحفظ وإصدار'],['inv_unlock','فك قفل الفواتير الصادرة'],['inv_cancel','إلغاء الفواتير وحذف المسودات'],['rc','وصولات الاستلام وتسجيل الدفعات'],['rc_void','إلغاء الوصولات'],['cust','دليل العملاء وكشوف الحسابات'],['audit','فحص التطابق المحاسبي'],['backup','النسخة الاحتياطية: تصدير واستيراد'],['settings','الإعدادات: الأعمدة، الختم، ربط Google Sheets'],['reset','تصفير جميع البيانات'],['users','إدارة المستخدمين والصلاحيات وسجل العمليات']];
+const PERMS=[['ship','الشحنات: إنشاء وتعديل الشحنات والحمولات وتغيير الحالة'],['deliver','تسجيل تسليم الحمولات وطباعة وصولاته'],['ship_del','حذف الشحنات'],['post','ترحيل الشحنات وإلغاء الترحيل (قفل تعديل الحمولات)'],['bal','رؤية المبالغ المتبقية وأرصدة العملاء في الشحنات'],['cost','تكاليف الشحنة وأرباحها: عرض وتعديل'],['inv','الفواتير: إنشاء وحفظ وإصدار'],['inv_unlock','فك قفل الفواتير الصادرة'],['inv_cancel','إلغاء الفواتير وحذف المسودات'],['rc','وصولات الاستلام وتسجيل الدفعات'],['rc_void','إلغاء الوصولات'],['cust','دليل العملاء وكشوف الحسابات'],['audit','فحص التطابق المحاسبي'],['backup','النسخة الاحتياطية: تصدير واستيراد'],['settings','الإعدادات: الأعمدة، الختم، ربط الخادم'],['reset','تصفير جميع البيانات'],['users','إدارة المستخدمين والصلاحيات وسجل العمليات']];
 const PERMN=Object.fromEntries(PERMS),PRE={all:PERMS.map(p=>p[0]),none:[],acc:['bal','cost','inv','inv_unlock','inv_cancel','rc','rc_void','cust','audit','backup'],ops:['ship','deliver']};
 const US={get:()=>LS.get('pst_users',{}),set:v=>LS.set('pst_users',v)};
 let ME=null,LG_FAIL=0,LG_WAIT=0,IDLE_T=null;
@@ -1408,13 +1408,13 @@ function authStart(){const U=US.get(),id=sessionStorage.getItem('pst_sess'),u=id
 $('lgForm').addEventListener('submit',e=>{e.preventDefault();const er=t=>{$('lgErr').textContent=t},user=$('lgUser').value.trim(),pw=$('lgPass').value;
   if($('lgForm').dataset.setup){const name=$('lgName').value.trim();
     if(!name||!user){er('اكتب الاسم واسم الدخول');return}if(pw.length<6){er('كلمة السر 6 أحرف على الأقل');return}if(pw!==$('lgPass2').value){er('كلمتا السر غير متطابقتين');return}
-    const id=newCid(),salt=newSalt(),u={id:id,name:name,user:user,salt:salt,hash:pwHash(salt,pw),admin:true,perms:[],active:true,ts:Date.now()},U=US.get();U[id]=u;US.set(U);enter(u,true);return}
+    const id=newCid(),salt=newSalt(),u={id:id,name:name,user:user,salt:salt,hash:pwHash(salt,pw),admin:true,perms:[],active:true,ts:Date.now()},U=US.get();U[id]=u;US.set(U);{const cu=($('lgUrl').value||'').trim(),cp=$('lgCpw').value;if(cu&&cp&&/^(https:\/\/script\.google\.com\/|\/api$)/.test(cu)){LS.set('pst_url',cu);LS.set('pst_pw',cp)}}enter(u,true);return}
   if(Date.now()<LG_WAIT){er('محاولات كثيرة — انتظر '+Math.ceil((LG_WAIT-Date.now())/1000)+' ثانية');return}
   const u=Object.values(US.get()).find(x=>String(x.user).toLowerCase()===user.toLowerCase());
   if(!u||u.active===false||pwHash(u.salt,pw)!==u.hash){LG_FAIL++;if(LG_FAIL>=5){LG_WAIT=Date.now()+30000;LG_FAIL=0}er(u&&u.active===false?'هذا الحساب موقوف — راجع المدير':'اسم الدخول أو كلمة السر غير صحيحة');$('lgPass').value='';return}
   enter(u)});
 $('lgCloudGo').addEventListener('click',async()=>{const er=t=>{$('lgErr').textContent=t},url=$('lgUrl').value.trim(),cp=$('lgCpw').value,user=$('lgUser').value.trim(),pw=$('lgPass').value;
-  if(!/^https:\/\/script\.google\.com\//.test(url)||!user||!pw){er('اكتب رابط السكربت وكلمة سر الربط واسم الدخول وكلمة السر');return}
+  if(!/^(https:\/\/script\.google\.com\/|\/api$)/.test(url)||!user||!pw){er('اكتب رابط الخادم (/api) وكلمة سر الربط واسم الدخول وكلمة السر');return}
   er('جارٍ الاتصال...');try{const post=async b=>{const r=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({pw:cp},b))});const j=await r.json();if(j.err)throw new Error(j.err);return j};
     const s1=await post({a:'usalt',user:user});if(!s1.salt)throw new Error('اسم الدخول أو كلمة السر غير صحيحة');
     const uh=pwHash(s1.salt,pw);let j;try{j=await post({a:'ulogin',u:user,uh:uh})}catch(x){throw /مصرّح|لا يوجد مستخدمون/.test(x.message)?new Error('اسم الدخول أو كلمة السر غير صحيحة'):x}
@@ -1459,7 +1459,7 @@ $('bPass').addEventListener('click',()=>{closeMenu();['p_old','p_new','p_new2'].
 $('pSave').addEventListener('click',async()=>{if(!ME)return;const o=$('p_old').value,n=$('p_new').value;
   if(pwHash(ME.salt,o)!==ME.hash){bad($('p_old'),'كلمة السر الحالية غير صحيحة');return}if(n.length<6){bad($('p_new'),'6 أحرف على الأقل');return}if(n!==$('p_new2').value){bad($('p_new2'),'غير متطابقة');return}
   const U=US.get(),u=Object.assign({},U[ME.id]),prev=ME;u.salt=newSalt();u.hash=pwHash(u.salt,n);u.ts=Date.now();
-  if(CL.u()){try{await api('usave',{user:u,self:1})}catch(e){toast('تعذر تغييرها في Google Sheets: '+e.message,'err');return}}
+  if(CL.u()){try{await api('usave',{user:u,self:1})}catch(e){toast('تعذر تغييرها على الخادم: '+e.message,'err');return}}
   U[u.id]=u;US.set(U);ME=u;logAct('تغيير كلمة السر','');$('mPass').classList.remove('on');toast('تم تغيير كلمة السر')});
 $('bLogout').addEventListener('click',()=>{closeMenu();logout('')});
 function logDraw(){const q=nk($('logq').value),L=LS.get('pst_log',[]).slice().reverse().filter(x=>!q||nk([x.u,x.n,x.a,x.r].join(' ')).includes(q)).slice(0,300);
@@ -1595,6 +1595,9 @@ document.addEventListener('keydown',e=>{
 window.addEventListener('beforeunload',e=>{if(DIRTY.i||DIRTY.r){e.preventDefault();e.returnValue=''}});
 {const dz=document.createElement('div');dz.className='dz';dz.innerHTML='<h3 class="shH" style="color:#c0392b">منطقة الخطر</h3><p class="hint" style="margin:0 0 8px">حذف الشحنة نهائي ولا يمكن التراجع عنه.</p>';dz.appendChild($('sh_del'));$('shEd').appendChild(dz)}
 {const hi=document.querySelector('header img');if(hi)$('brandImg').src=hi.src}
+(async()=>{if(!/^https?:$/.test(location.protocol))return;try{const r=await fetch('/api',{cache:'no-store'}),j=await r.json();if(!j||j.app!=='portist')return;
+  if(!CL.u())$('lgUrl').value='/api';
+  if(!Object.keys(US.get()).length){$('lgCloud').open=true;if(j.users)$('lgErr').textContent='يوجد حساب على الخادم: سجّل الدخول من هذا القسم (لا تنشئ حساباً جديداً). اكتب كلمة سر الربط واسم الدخول وكلمة السر ثم اضغط «دخول عبر الخادم».'}}catch(e){}})();
 $('rcv').setAttribute('list','custs');rid('from').setAttribute('list','custs');$('wm3').src=document.querySelector('header img').src;refCust();
 rid('from').addEventListener('change',()=>{const c=findCust(rv('from'));if(c&&c.phone&&!rv('phone')){rid('phone').value=c.phone;rdraw()}});
 $('bCust').addEventListener('click',cOpen);$('bSBack').addEventListener('click',()=>{const bk=S.sheetFn&&S.shBack;S.sheetFn=null;setMode(S.prev||'h');if(bk)bk()});
