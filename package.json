@@ -1,0 +1,9 @@
+{
+  "name": "portist-logistics",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Portist Lojistik — نظام الشحنات والفواتير",
+  "engines": { "node": ">=18" },
+  "dependencies": { "@neondatabase/serverless": "^1.2.1" },
+  "devDependencies": { "@electric-sql/pglite": "^0.5.16" }
+}

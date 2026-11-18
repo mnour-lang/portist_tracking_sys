@@ -1,6 +1,8 @@
 # ملفات الإنتاج والنسخ الاحتياطية (قد تحوي بيانات وكلمات سر)
-*.json
-!vercel.json
+# نسخ احتياطية بصيغة JSON فقط (لا تستثنِ package.json ولا vercel.json!)
+backup*.json
+portist-backup*.json
+*-backup*.json
 backup*
 *.bak
 *.zip
