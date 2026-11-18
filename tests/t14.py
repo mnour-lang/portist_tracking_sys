@@ -1,0 +1,22 @@
+import os;APP='file://'+os.environ.get('PST_HTML',os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','portist_invoice.html'))
+from playwright.sync_api import sync_playwright
+with sync_playwright() as p:
+    b=p.chromium.launch();pg=b.new_page(viewport={'width':1300,'height':900})
+    errs=[];pg.on('pageerror',lambda e:errs.append(str(e)))
+    pg.goto(''+APP+'');pg.wait_for_timeout(600)
+    pg.fill('#lgName','م');pg.fill('#lgUser','admin');pg.fill('#lgPass','secret1');pg.fill('#lgPass2','secret1');pg.click('#lgGo');pg.wait_for_timeout(500)
+    ok=lambda n,v:print(('PASS ' if v else 'FAIL ')+n)
+    pg.evaluate("shOpen()");pg.click('text=+ شحنة جديدة');pg.click('#sh_cm');pg.wait_for_timeout(200)
+    r=pg.locator('#cmBody tbody tr').nth(0)
+    r.locator('[data-k=cust]').fill('أحمد');r.locator('[data-k=pk]').fill('4')
+    r.locator('[data-a=pty]').click();pg.wait_for_timeout(200)
+    ok('dialog open',pg.is_visible('#mPty'))
+    pg.fill('[data-p=snN]','شركة الصين');pg.fill('[data-p=snP]','+86 123');pg.fill('[data-p=rcN]','محمد الحلبي');pg.fill('[data-p=rcA]','حلب');pg.fill('[data-p=nt]','هش — لا يُكدَّس')
+    pass
+    ok('indicator dot',pg.inner_text('#cmBody [data-a=pty]').endswith('●'))
+    pg.click('#mPty [data-close]');pg.wait_for_timeout(150)
+    ok('dialog closed, modal still open',not pg.is_visible('#mPty') and pg.is_visible('#mCons'))
+    pg.click('#cm_save');pg.wait_for_timeout(300)
+    d=pg.evaluate("Object.values(LS.get('pst_ship',{}))[0].cons[0]");ok('saved '+str([d['snN'],d['rcN'],d['rcA']]),d['snN']=='شركة الصين' and d['rcN']=='محمد الحلبي' and d['nt'].startswith('هش'))
+    pg.click('#sh_cm');pg.wait_for_timeout(150);pg.locator('[data-a=pty]').click();ok('reopen prefilled',pg.input_value('[data-p=rcA]')=='حلب')
+    print(errs);b.close()

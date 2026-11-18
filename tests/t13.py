@@ -1,0 +1,61 @@
+import os;APP='file://'+os.environ.get('PST_HTML',os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','portist_invoice.html'))
+from playwright.sync_api import sync_playwright
+with sync_playwright() as p:
+    b=p.chromium.launch();pg=b.new_page(viewport={'width':1300,'height':900})
+    errs=[];pg.on('pageerror',lambda e:errs.append(str(e)))
+    pg.goto(''+APP+'');pg.wait_for_timeout(600)
+    pg.fill('#lgName','م');pg.fill('#lgUser','admin');pg.fill('#lgPass','secret1');pg.fill('#lgPass2','secret1');pg.click('#lgGo');pg.wait_for_timeout(500)
+    ok=lambda n,v:print(('PASS ' if v else 'FAIL ')+n)
+    pg.evaluate("shOpen()");pg.wait_for_timeout(300)
+    pg.click('text=+ شحنة جديدة');pg.wait_for_timeout(200)
+    ok('new shipment: summary empty',pg.locator('#shCons tbody tr').count()==1 and 'لا توجد حمولات' in pg.inner_text('#shCons'))
+    ok('post hidden for new',not pg.is_visible('#sh_post'))
+    pg.click('#sh_cm');pg.wait_for_timeout(200)
+    ok('modal open w/ one blank row',pg.is_visible('#mCons') and pg.locator('#cmBody tbody tr').count()==1)
+    r=pg.locator('#cmBody tbody tr').nth(0)
+    r.locator('[data-k=cust]').fill('أحمد');r.locator('[data-k=goods]').fill('قماش');r.locator('[data-k=pk]').fill('4');r.locator('[data-k=cbm]').fill('3')
+    pg.click('#cm_add');r=pg.locator('#cmBody tbody tr').nth(1)
+    r.locator('[data-k=cust]').fill('سعيد');r.locator('[data-k=goods]').fill('أحذية');r.locator('[data-k=pk]').fill('6');r.locator('[data-k=cbm]').fill('1')
+    pg.fill('#sh_fr','400');pg.evaluate("shReadHead();shUpd()") 
+    pass
+    pg.click('#cm_save');pg.wait_for_timeout(300)
+    ok('saved & modal closed',not pg.is_visible('#mCons') and pg.evaluate("Object.values(LS.get('pst_ship',{}))[0].cons.length")==2)
+    ok('summary shows 2 rows + share',pg.locator('#shCons tbody tr').count()==2 and '300.00' in pg.inner_text('#shCons'))
+    ok('no inputs in summary',pg.locator('#shCons input').count()==0)
+    code=pg.evaluate("SH.code")
+    # post
+    pg.click('#sh_post');pg.wait_for_timeout(100);ok('confirm step',('تأكيد' in pg.inner_text('#sh_post')))
+    pg.click('#sh_post');pg.wait_for_timeout(300)
+    ok('posted flag stored',pg.evaluate("Object.values(LS.get('pst_ship',{}))[0].posted===true"))
+    ok('lock UI',('مقفلة' in pg.inner_text('#sh_cm')) and 'مُرحَّلة' in pg.inner_text('#shTitleSt'))
+    pg.click('#sh_cm');pg.wait_for_timeout(200)
+    ok('modal refused when posted',not pg.is_visible('#mCons'))
+    pg.screenshot(path='f_posted.png',full_page=True)
+    # tamper attempt: change cons in memory and save
+    pg.evaluate("SH.cons[0].goods='HACK';SH.cons.push(blankCons());SH.cons[2].cust='x';SH.cons[2].pk='1'");pg.evaluate("shSave(true)");pg.wait_for_timeout(300)
+    d=pg.evaluate("Object.values(LS.get('pst_ship',{}))[0].cons.map(c=>c.goods)");ok('save-time enforcement restores data '+str(d),d==['قماش','أحذية'])
+    # delivery still allowed
+    pg.evaluate("shEdit('%s')"%code);pg.wait_for_timeout(200)
+    pg.locator('#shCons tbody tr').nth(0).locator('[data-a=dl]').click();pg.wait_for_timeout(200)
+    ok('delivery panel opens on posted',pg.is_visible('#shDl'))
+    # list sub row locked
+    pg.evaluate("shShowList();shDraw()");pg.wait_for_timeout(200);pg.click('[data-hx]');pg.wait_for_timeout(100)
+    ok('list shows lock',('مُرحَّلة' in pg.inner_text('#shList')) and ('مقفلة' in pg.inner_text('.shXr')))
+    pg.locator('[data-hc]').first.click();pg.wait_for_timeout(300);ok('hc on posted opens shipment not modal',not pg.is_visible('#mCons') and pg.is_visible('#shEd'))
+    # unpost
+    pg.click('#sh_post');pg.click('#sh_post');pg.wait_for_timeout(300)
+    ok('unposted',pg.evaluate("!Object.values(LS.get('pst_ship',{}))[0].posted"))
+    pg.locator('[data-a=dl]').first  # noop
+    pg.evaluate("shShowList();shDraw()");pg.wait_for_timeout(200)
+    pg.locator('[data-hc]').nth(1).click();pg.wait_for_timeout(300)
+    ok('hc opens modal on that row',pg.is_visible('#mCons') and pg.evaluate("document.activeElement.value")=='سعيد')
+    pg.click('#mCons [data-close]');pg.wait_for_timeout(200);ok('close works',not pg.is_visible('#mCons'))
+    # fully delivered => locked w/o posting
+    pg.evaluate("""()=>{const D=LS.get('pst_ship',{}),h=Object.values(D)[0];h.cons.forEach(c=>c.dl=[{no:'DL-1',date:'2026-11-01',pk:c.pk}]);LS.set('pst_ship',D);shEdit(h.code)}""");pg.wait_for_timeout(300)
+    ok('delivered => locked',shl:=pg.evaluate("shLocked(SH)"))
+    pg.click('#sh_cm');pg.wait_for_timeout(200);ok('modal refused when delivered',not pg.is_visible('#mCons'))
+    ok('post button hidden when delivered',not pg.is_visible('#sh_post'))
+    # permissions: employee without post
+    pg.evaluate("""()=>{const U=US.get();U.e1={id:'e1',name:'موظف',user:'e',salt:'s',hash:'x',admin:false,perms:['ship','deliver'],active:true};US.set(U);ME=U.e1;applyPerms()}""")
+    ok('post perm hides button',pg.evaluate("getComputedStyle($('sh_post')).display")=='none' or not pg.is_visible('#sh_post'))
+    print(errs);b.close()
