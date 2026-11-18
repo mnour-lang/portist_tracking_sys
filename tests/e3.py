@@ -56,6 +56,29 @@ with sync_playwright() as p:
     A.evaluate("shEdit('%s')"%code);A.wait_for_timeout(200);A.fill('#sh_notes','live2');A.evaluate("shReadHead()");A.evaluate("shSave()")
     B.wait_for_function("SHS.get()['%s'].notes==='live2'"%code,timeout=9000)
     ok('LIVE: shipment edit reaches B without opening it',True)
+    # ===== حذف الشحنة يتزامن + حفظ قديم لا يُحيي المحذوف =====
+    def mk(P,note):
+        P.evaluate("shOpen()");P.wait_for_timeout(300);P.click('text=+ شحنة جديدة');P.wait_for_timeout(200);P.click('#sh_cm');P.wait_for_timeout(200)
+        r=P.locator('#cmBody tbody tr').nth(0);r.locator('[data-k=cust]').fill({'x':'زيد','y':'سامر'}[note]);r.locator('[data-k=goods]').fill('بضاعة');r.locator('[data-k=pk]').fill('2')
+        P.fill('#sh_fr','100');P.evaluate("shReadHead()");P.click('#cm_save');P.wait_for_timeout(2500)
+    before=set(A.evaluate("Object.keys(SHS.get())"));mk(A,'x')
+    c2=[c for c in A.evaluate("Object.keys(SHS.get())") if c not in before][0]
+    B.evaluate("shOpen()");B.wait_for_function("Object.keys(SHS.get()).includes('%s')"%c2,timeout=9000)
+    ok('seq: new shipment appears on B live',True)
+    B.evaluate("shEdit('%s')"%c2);B.wait_for_timeout(300)
+    A.evaluate("shEdit('%s')"%c2);A.wait_for_timeout(300);A.click('#sh_del');A.click('#sh_del');A.wait_for_timeout(1500)
+    ok('seq: A deleted it from server+local',A.evaluate("!Object.keys(SHS.get()).includes('%s')"%c2))
+    B.fill('#sh_notes','late edit');B.evaluate("shReadHead()");B.evaluate("shSave()");B.wait_for_timeout(1500)
+    ok('seq: stale save on B does NOT resurrect the shipment',B.evaluate("!Object.keys(SHS.get()).includes('%s')"%c2))
+    A.wait_for_timeout(3000)
+    ok('seq: server really has no such shipment',A.evaluate("(async()=>!(await api('shlist')).items.some(x=>x.code==='%s'))()"%c2))
+    # حذف على A (ثانية) والتأكد أن B في قائمة الشحنات يُحدَّث دون فتحها
+    before=set(A.evaluate("Object.keys(SHS.get())"));mk(A,'y')
+    c3=[c for c in A.evaluate("Object.keys(SHS.get())") if c not in before][0]
+    B.evaluate("shOpen()");B.wait_for_function("Object.keys(SHS.get()).includes('%s')"%c3,timeout=9000)
+    A.evaluate("shEdit('%s')"%c3);A.wait_for_timeout(300);A.click('#sh_del');A.click('#sh_del')
+    B.wait_for_function("!Object.keys(SHS.get()).includes('%s')"%c3,timeout=9000)
+    ok('seq: deletion on A disappears from B list live',B.evaluate("!document.getElementById('shLst').innerText.includes('%s')"%c3))
     # الخروج يمسح نسخة الجهاز، والدخول يعيد كل شيء من الخادم
     B.evaluate("logout()");B.wait_for_timeout(2500)
     ok('logout wipes local data cache',B.evaluate("['pst_inv','pst_ship','pst_cust','pst_prod','pst_log','pst_users'].every(k=>localStorage.getItem(k)===null)"))
