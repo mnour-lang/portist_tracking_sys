@@ -1,0 +1,23 @@
+import os;APP='file://'+os.environ.get('PST_HTML',os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','portist_invoice.html'))
+from playwright.sync_api import sync_playwright
+ok=lambda n,v:print(('PASS ' if v else 'FAIL ')+n)
+with sync_playwright() as p:
+    b=p.chromium.launch();pg=b.new_page(viewport={'width':1300,'height':900})
+    errs=[];pg.on('pageerror',lambda e:errs.append(str(e)))
+    pg.goto(APP);pg.wait_for_timeout(500)
+    pg.fill('#lgName','م');pg.fill('#lgUser','admin');pg.fill('#lgPass','secret1');pg.fill('#lgPass2','secret1');pg.click('#lgGo');pg.wait_for_timeout(500)
+    pg.evaluate("shOpen()");pg.wait_for_timeout(300);pg.click('text=+ شحنة جديدة');pg.wait_for_timeout(200)
+    ok('default new-stage date = today',pg.input_value('#sh_nd')==pg.evaluate("shToday()"))
+    ok('first stage date editable',pg.locator('#shStep [data-sd=ld]').count()==1)
+    pg.fill('#sh_nd','2026-11-20');pg.click('#sh_next');pg.wait_for_timeout(200)
+    ok('moved to transit with chosen date',pg.evaluate("SH.hist.find(x=>x.st==='tr').date")=='2026-11-20')
+    ok('picker reset to today after move',pg.input_value('#sh_nd')==pg.evaluate("shToday()"))
+    ok('step shows editable date',pg.input_value('#shStep [data-sd=tr]')=='2026-11-20')
+    pg.fill('#shStep [data-sd=tr]','2026-11-22');pg.wait_for_timeout(200)
+    ok('edit stage date updates hist',pg.evaluate("SH.hist.find(x=>x.st==='tr').date")=='2026-11-22')
+    pg.fill('#shStep [data-sd=ld]','2026-12-01');pg.wait_for_timeout(200)
+    ok('out-of-order warning shown',('أسبق' in pg.inner_text('#toast')))
+    pg.click('#sh_prev');pg.wait_for_timeout(200)
+    ok('going back keeps the stage date',pg.evaluate("SH.hist.find(x=>x.st==='ld').date")=='2026-12-01')
+    pass
+    print(errs);b.close()
