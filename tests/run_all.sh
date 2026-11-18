@@ -3,7 +3,7 @@
 # المتطلبات: node, python3 + playwright (pip install playwright && playwright install chromium)
 cd "$(dirname "$0")"; fail=0
 echo "== server (Code.gs mock)"; node gstest.js | grep -E "FAIL" && fail=1
-for t in a7 a8 t13 t14 t17 t18 t19 t20 t21; do echo "== $t"; python3 $t.py 2>&1 | tee /tmp/_t.log | grep -E "FAIL|Traceback|Error" && fail=1; done
+for t in a7 a8 t13 t14 t17 t18 t19 t20 t21 t24; do echo "== $t"; python3 $t.py 2>&1 | tee /tmp/_t.log | grep -E "FAIL|Traceback|Error" && fail=1; done
 node gsrv.js >/dev/null 2>&1 & S=$!; sleep 1
 for t in e1 e2; do echo "== $t (cloud, two devices)"; python3 $t.py 2>&1 | tee /tmp/_t.log | grep -E "FAIL|Traceback|Error" && fail=1; pkill -f gsrv.js; node gsrv.js >/dev/null 2>&1 & S=$!; sleep 1; done
 kill $S 2>/dev/null
