@@ -88,6 +88,27 @@ const { makeHandler } = require('../lib/core');
   const lk = await H.run({ a: 'ulogin', u: 'vic', uh: 'hv' });
   ck('lockout after 8 failures even with correct password', /محاولات/.test(lk.err || ''));
   ck('lockout is per user (admin unaffected)', !!(await H.run({ a: 'ulogin', ...A })).user);
+  // التخزين المشترك + التوقيع اللحظي
+  const g0 = (await H.run({ a: 'sig', ...A })).sig;
+  ck('sig returns a string', typeof g0 === 'string' && g0.split('|').length === 5);
+  ck('kvput map entries + scalar', (await H.run({ a: 'kvput', ...A, ops: [{ k: 'pst_cust', id: 'c1', v: { id: 'c1', name: 'أحمد' } }, { k: 'pst_cust', id: 'c2', v: { id: 'c2', name: 'ب' } }, { k: 'pst_foot', id: '', v: 'شكراً' }] })).n === 3);
+  const g1 = (await H.run({ a: 'sig', ...A })).sig;
+  ck('sig changes after kv write', g1 !== g0);
+  const kv = (await H.run({ a: 'kvget', since: 0, ...A })).items;
+  ck('kvget returns all rows', kv.length === 3 && kv.find(x => x.id === 'c1').v.name === 'أحمد');
+  await new Promise(r => setTimeout(r, 5));
+  await H.run({ a: 'kvput', ...A, ops: [{ k: 'pst_cust', id: 'c2', del: 1 }] });
+  const kv2 = (await H.run({ a: 'kvget', since: Math.max(...kv.map(x => x.u)) + 1, ...A })).items;
+  ck('delete = tombstone visible incrementally', kv2.length === 1 && kv2[0].del === true && kv2[0].id === 'c2');
+  ck('sig changes after delete', (await H.run({ a: 'sig', ...A })).sig !== g1);
+  await H.run({ a: 'kvput', ...A, ops: [{ k: 'pst_dseq', id: '', v: 5, max: 1 }] });
+  await H.run({ a: 'kvput', ...A, ops: [{ k: 'pst_dseq', id: '', v: 3, max: 1 }] });
+  ck('max counter never goes down', (await H.run({ a: 'kvget', since: 0, ...A })).items.find(x => x.k === 'pst_dseq').v === 5);
+  await H.run({ a: 'kvput', ...A, ops: [{ k: 'pst_cust', id: 'c1', v: { name: 'نسخة قديمة' }, isNew: true }, { k: 'pst_cust', id: 'c2', v: { name: 'مرفوض' }, isNew: true }] });
+  const kv3 = (await H.run({ a: 'kvget', since: 0, ...A })).items;
+  ck('isNew never overwrites existing or deleted', kv3.find(x => x.id === 'c1').v.name === 'أحمد' && kv3.find(x => x.id === 'c2').del === true);
+  ck('unknown key ignored', (await H.run({ a: 'kvput', ...A, ops: [{ k: 'evil', id: 'x', v: 1 }] })).n === 0);
+  ck('kv requires login', !!(await H.run({ a: 'kvget', since: 0 })).err && !!(await H.run({ a: 'sig', u: 'admin', uh: 'bad' })).err);
   // fail-open
   await sql('DELETE FROM users');
   ck('users table emptied after AUTH => refused (no fail-open)', !!(await call({ a: 'list' })).err);
