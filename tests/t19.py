@@ -13,6 +13,6 @@ with sync_playwright() as p:
         for k in 'AB':
             pg.click(f'[data-hr="{k}"]');pg.wait_for_timeout(300)
             pg.locator('#spaper').screenshot(path=f'm_{lang}_{k}.png')
-            print(lang,k,'route text:',pg.inner_text('#spaper .st-cu >> text=المسار >> xpath=..').replace('\n',' | '))
+            print(lang,k,'route text:',pg.inner_text('#spaper .st-cu >> text=%s >> xpath=..'%('المسار' if lang=='ar' else 'Route')).replace('\n',' | '))
             pg.evaluate("S.shBack&&S.shBack()");pg.wait_for_timeout(200)
     print(errs);b.close()
