@@ -88,6 +88,12 @@ const { makeHandler } = require('../lib/core');
   const lk = await H.run({ a: 'ulogin', u: 'vic', uh: 'hv' });
   ck('lockout after 8 failures even with correct password', /محاولات/.test(lk.err || ''));
   ck('lockout is per user (admin unaffected)', !!(await H.run({ a: 'ulogin', ...A })).user);
+  // كود العميل يتكرر في أكثر من فاتورة؛ رقم الفاتورة وحده فريد
+  await H.run({ a: 'save', code: 'CR-1', isNew: true, d: { rcv: 'عميل ك', cref: 'GIB-9', date: '2026-01-01', t: 10, st: 'draft' }, ...A });
+  await H.run({ a: 'save', code: 'CR-2', isNew: true, d: { rcv: 'عميل ك', cref: 'GIB-9', date: '2026-01-02', t: 20, st: 'draft' }, ...A });
+  const crl = (await H.run({ a: 'list', ...A })).items.filter(x => x.cref === 'GIB-9');
+  ck('same customer code on two invoices (list returns cref)', crl.length === 2);
+  ck('duplicate invoice number still refused by the server', (await H.run({ a: 'save', code: 'CR-1', isNew: true, d: { rcv: 'x', date: '2026-01-03', t: 1 }, ...A })).err === 'exists');
   // التخزين المشترك + التوقيع اللحظي
   const g0 = (await H.run({ a: 'sig', ...A })).sig;
   ck('sig returns a string', typeof g0 === 'string' && g0.split('|').length === 5);
