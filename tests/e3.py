@@ -79,6 +79,9 @@ with sync_playwright() as p:
     A.evaluate("shEdit('%s')"%c3);A.wait_for_timeout(300);A.click('#sh_del');A.click('#sh_del')
     B.wait_for_function("!Object.keys(SHS.get()).includes('%s')"%c3,timeout=9000)
     ok('seq: deletion on A disappears from B list live',B.evaluate("!document.getElementById('shLst').innerText.includes('%s')"%c3))
+    # رابط مباشر يعمل في وضع الخادم أيضاً بعد التحميل من القاعدة
+    B.goto(BASE+'#/shipments/'+code);B.reload();B.wait_for_timeout(3500)
+    ok('server mode: deep link opens the shipment after loading from the DB',B.evaluate("!!ME&&S.mode==='h'&&document.getElementById('shEd').style.display!=='none'&&!!SH&&SH.code==='%s'"%code))
     # الخروج يمسح نسخة الجهاز، والدخول يعيد كل شيء من الخادم
     B.evaluate("logout()");B.wait_for_timeout(2500)
     ok('logout wipes local data cache',B.evaluate("['pst_inv','pst_ship','pst_cust','pst_prod','pst_log','pst_users'].every(k=>localStorage.getItem(k)===null)"))
