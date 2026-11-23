@@ -2328,7 +2328,7 @@ function ccPdUI(){$('cc_pdw').style.display=$('cc_pd').checked?'':'none'}
 function ccModal(code,id){if(!need('cost'))return;const D=SHS.get(),sh=Object.keys(D).sort().reverse();if(!sh.length){toast(_t("أنشئ شحنة أولاً"),'err');return}
   const x=id?ccLines().find(l=>l.id===id&&l._h===code):null;CCS.ed={code:code||'',id:id||''};
   $('mcT').textContent=id?_t("تعديل تكلفة"):_t("تكلفة جديدة");
-  $('cc_ship').innerHTML=sh.map(c=>`<option value="${esc(c)}">${esc(c)}${(D[c].cons||[])[0]?' — '+esc(D[c].cons[0].cust||''):''}</option>`).join('');
+  $('cc_ship').innerHTML=sh.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
   $('cc_type').innerHTML=COSTT.map(t=>`<option value="${esc(t)}">${esc(_t(t))}</option>`).join('');
   $('ccSupL').innerHTML=[...new Set(ccLines().map(l=>String(l.sup||'').trim()).filter(Boolean))].map(v=>`<option value="${esc(v)}">`).join('');
   $('cc_ship').value=code||sh[0];$('cc_ship').disabled=!!id;const sc=(D[$('cc_ship').value]||{}).cur||'$';
