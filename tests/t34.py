@@ -5,6 +5,7 @@ with sync_playwright() as p:
     b=p.chromium.launch();pg=b.new_page(viewport={'width':1300,'height':900});errs=[];pg.on('pageerror',lambda e:errs.append(str(e)))
     pg.goto(APP);pg.wait_for_timeout(500)
     pg.fill('#lgName','م');pg.fill('#lgUser','admin');pg.fill('#lgPass','secret1');pg.fill('#lgPass2','secret1');pg.click('#lgGo');pg.wait_for_timeout(500)
+    pg.evaluate("LS.set('pst_revpol','inv')")
     # شحنة: أجرة 1000 (CBM 3 و1)، تكلفة مشتركة 400، تكلفة مباشرة 100 على B
     pg.evaluate("""()=>{
       const inv={'F-1':{rcv:'A',st:'issued',t:2000,pd:500,cur:'$',ship:'SH-1',date:'2026-01-02'},'F-2':{rcv:'B',st:'issued',t:600,pd:600,cur:'$',ship:'SH-1',date:'2026-01-02'},'F-3':{rcv:'B',st:'draft',t:999,pd:0,cur:'$',ship:'SH-1',date:'2026-01-02'}};

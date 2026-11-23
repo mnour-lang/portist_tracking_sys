@@ -11,6 +11,7 @@ with sync_playwright() as p:
     b=p.chromium.launch();pg=b.new_page(viewport={'width':1360,'height':1100});errs=[];pg.on('pageerror',lambda e:errs.append(str(e)))
     pg.goto(APP);pg.wait_for_timeout(500)
     pg.fill('#lgName','م');pg.fill('#lgUser','admin');pg.fill('#lgPass','secret1');pg.fill('#lgPass2','secret1');pg.click('#lgGo');pg.wait_for_timeout(800)
+    pg.evaluate("LS.set('pst_revpol','inv')")
     ok('dashboard is the landing page',pg.evaluate("S.mode")=='d' and pg.evaluate("location.hash")=='#/dashboard' and pg.is_visible('#dash'))
     ok('empty state shows welcome',pg.evaluate("!!document.querySelector('.dWel')"))
     pg.evaluate(SEED);pg.evaluate("setMode('h')");pg.evaluate("setMode('d')");pg.wait_for_timeout(700)

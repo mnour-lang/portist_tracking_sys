@@ -8,7 +8,7 @@ with sync_playwright() as p:
     pg.fill('#lgName','م');pg.fill('#lgUser','admin');pg.fill('#lgPass','secret1');pg.fill('#lgPass2','secret1');pg.click('#lgGo');pg.wait_for_timeout(700)
     ok('dashboard is landing even with stale quick flag',pg.evaluate("S.mode")=='d' and pg.evaluate("location.hash")=='#/dashboard')
     pg.evaluate("routeTo('#/settings')");pg.wait_for_timeout(500)
-    ok('settings nav has 7 sections for admin',pg.evaluate("document.querySelectorAll('#gNav button').length")==7)
+    ok('settings nav has 9 sections for admin',pg.evaluate("document.querySelectorAll('#gNav button').length")==9)
     ok('window style select default modern',pg.input_value('#gMui')=='m' and not pg.evaluate("document.body.classList.contains('mui-c')"))
     pg.click('#bUsers');pg.wait_for_timeout(300)
     r=pg.evaluate("getComputedStyle(document.querySelector('#mUsers .mp')).borderRadius")
