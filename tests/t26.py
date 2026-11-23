@@ -12,7 +12,7 @@ with sync_playwright() as p:
     pg.fill('#lgName','م');pg.fill('#lgUser','admin');pg.fill('#lgPass','secret1');pg.fill('#lgPass2','secret1');pg.click('#lgGo');pg.wait_for_timeout(500)
     pg.evaluate(SEED);pg.reload();pg.wait_for_timeout(600)
     tabs=pg.evaluate("[...document.querySelectorAll('.tabs .tab')].filter(t=>t.offsetParent).map(t=>t.textContent)")
-    ok('tabs',tabs==['الشحنات','المحاسبة','العملاء'])
+    ok('tabs',tabs==['الرئيسية','الشحنات','المحاسبة','العملاء'])
     pg.click('#tabA');pg.wait_for_timeout(500)
     ok('accounting page visible',pg.is_visible('#awrap'))
     ok('invoice rows listed',pg.locator('#invList .lsG').count()>=2)

@@ -14,7 +14,7 @@ with sync_playwright() as p:
     ok('A: wrong setup key refused',A.evaluate("!ME"))
     A.fill('#lgKey','k');A.click('#lgGo');A.wait_for_timeout(2000)
     ok('A: signed in and linked to server',A.evaluate("!!ME&&CL.u()==='/api'"))
-    A.evaluate("shOpen()");A.wait_for_timeout(300);A.click('text=+ شحنة جديدة');A.wait_for_timeout(200);A.click('#sh_cm');A.wait_for_timeout(200)
+    A.evaluate("shOpen()");A.wait_for_timeout(300);A.click('#shNew');A.wait_for_timeout(200);A.click('#sh_cm');A.wait_for_timeout(200)
     r=A.locator('#cmBody tbody tr').nth(0);r.locator('[data-k=cust]').fill('أحمد');r.locator('[data-k=goods]').fill('قماش');r.locator('[data-k=pk]').fill('4')
     A.fill('#sh_fr','400');A.evaluate("shReadHead()");A.click('#cm_save');A.wait_for_timeout(1200)
     code=A.evaluate("Object.keys(SHS.get())[0]")
@@ -58,7 +58,7 @@ with sync_playwright() as p:
     ok('LIVE: shipment edit reaches B without opening it',True)
     # ===== حذف الشحنة يتزامن + حفظ قديم لا يُحيي المحذوف =====
     def mk(P,note):
-        P.evaluate("shOpen()");P.wait_for_timeout(300);P.click('text=+ شحنة جديدة');P.wait_for_timeout(200);P.click('#sh_cm');P.wait_for_timeout(200)
+        P.evaluate("shOpen()");P.wait_for_timeout(300);P.click('#shNew');P.wait_for_timeout(200);P.click('#sh_cm');P.wait_for_timeout(200)
         r=P.locator('#cmBody tbody tr').nth(0);r.locator('[data-k=cust]').fill({'x':'زيد','y':'سامر'}[note]);r.locator('[data-k=goods]').fill('بضاعة');r.locator('[data-k=pk]').fill('2')
         P.fill('#sh_fr','100');P.evaluate("shReadHead()");P.click('#cm_save');P.wait_for_timeout(2500)
     before=set(A.evaluate("Object.keys(SHS.get())"));mk(A,'x')

@@ -12,7 +12,7 @@ def inv(pg,rcv,cref,amt):
 with sync_playwright() as p:
     b=p.chromium.launch();pg=b.new_page(viewport={'width':1300,'height':900});errs=[];pg.on('pageerror',lambda e:errs.append(str(e)))
     pg.goto(APP);pg.wait_for_timeout(500)
-    pg.fill('#lgName','م');pg.fill('#lgUser','admin');pg.fill('#lgPass','secret1');pg.fill('#lgPass2','secret1');pg.click('#lgGo');pg.wait_for_timeout(500)
+    pg.fill('#lgName','م');pg.fill('#lgUser','admin');pg.fill('#lgPass','secret1');pg.fill('#lgPass2','secret1');pg.click('#lgGo');pg.wait_for_timeout(500);pg.evaluate("shOpen()");pg.wait_for_timeout(300)
     # عميل بكود ثابت
     pg.evaluate("setMode('c')");pg.click('#cNew');pg.fill('#cf_name','شركة الأمل');pg.fill('#cf_code','GIB-777');pg.fill('#cf_phone','0555');pg.click('#cf_save');pg.wait_for_timeout(200)
     cid=pg.evaluate("Object.values(CU.get())[0].id")
@@ -23,7 +23,7 @@ with sync_playwright() as p:
     # فاتورة لعميل آخر ولا تدخل
     inv(pg,'عميل آخر',None,70)
     # حمولة بكتابة الكود بدل الاسم
-    pg.evaluate("shOpen()");pg.wait_for_timeout(300);pg.click('text=+ شحنة جديدة');pg.wait_for_timeout(200);pg.click('#sh_cm');pg.wait_for_timeout(200)
+    pg.evaluate("shOpen()");pg.wait_for_timeout(300);pg.click('#shNew');pg.wait_for_timeout(200);pg.click('#sh_cm');pg.wait_for_timeout(200)
     r=pg.locator('#cmBody tbody tr').nth(0);r.locator('[data-k=cust]').fill('GIB-777');r.locator('[data-k=cust]').press('Tab');r.locator('[data-k=goods]').fill('ملابس');r.locator('[data-k=pk]').fill('4')
     ok('consignment typed by code resolves to the customer name',r.locator('[data-k=cust]').input_value()=='شركة الأمل')
     pg.fill('#sh_fr','100');pg.evaluate("shReadHead()");pg.click('#cm_save');pg.wait_for_timeout(900)

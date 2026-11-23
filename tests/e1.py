@@ -14,7 +14,7 @@ def newdev(b):
     ctx=b.new_context(viewport={'width':1300,'height':900});ctx.route('https://script.google.com/**',route);pg=ctx.new_page()
     errs=[];pg.on('pageerror',lambda e:errs.append(str(e)));pg.goto(''+APP+'');pg.wait_for_timeout(500);return pg,errs
 def mkship(pg,cust='أحمد',pk='4'):
-    pg.evaluate("shOpen()");pg.wait_for_timeout(300);pg.click('text=+ شحنة جديدة');pg.wait_for_timeout(200);pg.click('#sh_cm');pg.wait_for_timeout(200)
+    pg.evaluate("shOpen()");pg.wait_for_timeout(300);pg.click('#shNew');pg.wait_for_timeout(200);pg.click('#sh_cm');pg.wait_for_timeout(200)
     r=pg.locator('#cmBody tbody tr').nth(0);r.locator('[data-k=cust]').fill(cust);r.locator('[data-k=goods]').fill('قماش');r.locator('[data-k=pk]').fill(pk)
     pg.fill('#sh_fr','400');pg.evaluate("shReadHead()");pg.click('#cm_save');pg.wait_for_timeout(600)
 with sync_playwright() as p:

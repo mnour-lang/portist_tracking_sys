@@ -23,7 +23,7 @@ with sync_playwright() as p:
     ok('numbers normalized',not bad,bad)
     ok('num(number) passthrough',pg.evaluate("num(12.5)===12.5&&num(NaN)===0&&r2('1,234.567')===1234.57"))
     # UI normalization on change
-    pg.evaluate("shOpen()");pg.click('text=+ شحنة جديدة');pg.wait_for_timeout(200)
+    pg.evaluate("shOpen()");pg.click('#shNew');pg.wait_for_timeout(200)
     pg.fill('#sh_fr','١٬٥٠٠٫٥');pg.dispatch_event('#sh_fr','change');ok('freight field normalized on change',pg.input_value('#sh_fr')=='1500.5',pg.input_value('#sh_fr'))
     # 7 pk required + create valid shipment
     pg.click('#sh_cm');pg.wait_for_timeout(150)
