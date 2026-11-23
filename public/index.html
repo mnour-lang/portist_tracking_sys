@@ -455,6 +455,31 @@ input[type=checkbox]:not(.sheet *),input[type=radio]:not(.sheet *){width:22px;he
 .ccF{display:grid;grid-template-columns:1fr 1fr;gap:10px}.ccF .w2{grid-column:1/-1}.ccF label{display:flex;flex-direction:column;gap:3px;font-size:9.5pt}.ccF .chk{flex-direction:row;align-items:center;gap:8px;padding-top:18px}
 .ccBack{margin:0 0 10px}.ccSum{display:flex;gap:14px;flex-wrap:wrap;align-items:center;background:var(--tint);border-radius:12px;padding:10px 14px}.ccSum b{font-size:11pt}
 @media(max-width:700px){.ccF{grid-template-columns:1fr}}
+
+/* ===== نافذة التكلفة ===== */
+.mp.ccm{width:min(560px,94vw);padding:0;border-radius:18px;overflow:hidden;display:flex;flex-direction:column;max-height:92vh}
+.ccm-h{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--line);background:#fff}.ccm-h b{font-size:14pt;color:var(--teal-d)}
+.ccm-x{all:unset;box-sizing:border-box;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;cursor:pointer;color:var(--muted);transition:background .15s}.ccm-x:hover{background:var(--tint);color:var(--teal-d)}.ccm-x:focus-visible,.ccm-chips button:focus-visible{outline:2px solid var(--teal-d);outline-offset:2px}
+.ccm-b{padding:18px 22px;overflow:auto;display:flex;flex-direction:column;gap:16px}
+.ccm-f,.ccm-g{display:flex;flex-direction:column;gap:6px;font-size:9.5pt;font-weight:600;color:var(--muted);min-width:0}.ccm-l{font-size:9.5pt;font-weight:600;color:var(--muted)}
+.ccm-b input:not([type=checkbox]),.ccm-b select{font:inherit;font-size:11pt;font-weight:400;color:var(--ink);min-height:44px;padding:8px 12px;border:1.5px solid var(--line);border-radius:12px;background:#fff;width:100%;box-sizing:border-box;transition:border-color .15s,box-shadow .15s}
+.ccm-b input:focus,.ccm-b select:focus{outline:0;border-color:var(--teal);box-shadow:0 0 0 4px rgba(43,181,166,.16)}.ccm-b .bad{border-color:var(--coral)!important;box-shadow:0 0 0 4px rgba(229,72,95,.12)!important}
+.ccm-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ccm-amt{background:linear-gradient(180deg,var(--tint),#fff);border:1.5px solid var(--line);border-radius:16px;padding:14px}
+.ccm-amtrow{display:flex;gap:10px;align-items:stretch}.ccm-amtrow input{flex:1;font-size:22pt!important;font-weight:700!important;min-height:60px!important;text-align:start;border-radius:14px!important;letter-spacing:.3px;font-variant-numeric:tabular-nums}.ccm-amtrow select{width:42%!important;max-width:190px;min-height:60px!important;font-weight:600!important;border-radius:14px!important}
+.ccm-fx{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}.ccm-fx label{display:flex;flex-direction:column;gap:5px;font-size:9pt;font-weight:600;color:var(--muted)}.ccm-hint{margin:8px 0 0;font-size:9pt;color:var(--muted);min-height:0}.ccm-hint:empty{display:none}
+.ccm-chips{display:flex;flex-wrap:wrap;gap:7px}.ccm-chips button{all:unset;box-sizing:border-box;cursor:pointer;padding:7px 14px;border-radius:999px;border:1.5px solid var(--line);background:#fff;font-size:9.5pt;font-weight:500;color:var(--ink);transition:background .15s,border-color .15s,color .15s}.ccm-chips button:hover{border-color:var(--teal);background:var(--tint)}.ccm-chips button[aria-checked=true]{background:var(--teal-d);border-color:var(--teal-d);color:#fff;font-weight:600}
+.ccm-pay{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;padding:12px 14px;border:1.5px solid var(--line);border-radius:14px;background:#fbfdfd}.ccm-pay .ccm-f{flex:1;max-width:220px}
+.ccm-sw{display:inline-flex;align-items:center;gap:10px;cursor:pointer;font-size:10.5pt;font-weight:600;color:var(--ink);padding-bottom:10px}.ccm-sw input{position:absolute;opacity:0;width:1px;height:1px}.ccm-sw i{width:44px;height:26px;border-radius:999px;background:#c9d6d6;position:relative;transition:background .2s;flex:none}.ccm-sw i:after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:inset-inline-start .2s}.ccm-sw input:checked+i{background:var(--teal-d)}.ccm-sw input:checked+i:after{inset-inline-start:21px}.ccm-sw input:focus-visible+i{outline:2px solid var(--teal-d);outline-offset:2px}
+.ccm-ft{display:flex;gap:10px;padding:14px 22px;border-top:1px solid var(--line);background:#fff}.ccm-ft .b1{flex:1;min-height:46px;font-size:11pt;font-weight:700;border-radius:12px}.ccm-ft .b2{min-height:46px;padding:0 22px;border-radius:12px}
+@media(max-width:600px){.ccm-2,.ccm-fx{grid-template-columns:1fr}.ccm-amtrow input{font-size:18pt!important}.ccm-pay{flex-direction:column;align-items:stretch}.ccm-pay .ccm-f{max-width:none}.ccm-sw{padding-bottom:0}}
+@media(max-width:600px){.modal:has(.ccm){align-items:flex-end}.mp.ccm{width:100vw;max-height:94dvh;border-radius:20px 20px 0 0}}
+#cc select[data-alloc]{font:inherit;font-size:9.5pt;border:1.5px solid var(--line);border-radius:10px;padding:6px 10px;background:#fff;min-height:34px}#cc .dC h3 small{font-weight:500;color:var(--muted)}
+/* تلميع الصفحة */
+#cc .shScroll{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:auto;box-shadow:0 1px 2px rgba(14,60,64,.04)}
+.ccT th{background:#f6fbfa!important;color:var(--muted)!important;font-weight:600;padding:11px 12px!important;border-bottom:1px solid var(--line)}.ccT td{padding:11px 12px!important}.ccT tbody tr{transition:background .12s}.ccT tbody tr:hover{background:var(--tint)}.ccT tbody tr:last-child td{border-bottom:0}.ccT tr[data-open]{cursor:pointer}.ccT td.num,.ccT th.num{text-align:end;font-variant-numeric:tabular-nums}.ccT tfoot td{background:#f6fbfa;font-weight:700;padding:11px 12px;border-top:1.5px solid var(--line)}.ccT .pos{color:#14804a}.ccT .neg{color:#c0334b}
+#cc .ccSeg{padding:4px;box-shadow:0 1px 2px rgba(14,60,64,.05)}#cc .ccSeg button.on{background:var(--teal-d);color:#fff;box-shadow:0 2px 6px rgba(14,122,111,.3)}
+#cc .dC{border-radius:16px;padding:16px 18px}#cc .dK{border-radius:16px;padding:14px 16px}#cc .dK b{font-size:18pt}
 </style>
 </head>
 <body class="out"><a class="skipL" href="#" id="skipL">تخطي إلى المحتوى</a>
@@ -677,14 +702,20 @@ input[type=checkbox]:not(.sheet *),input[type=radio]:not(.sheet *){width:22px;he
 <p id="cfTxt" style="margin:0 0 10px;line-height:1.9"></p>
 <p class="hint" style="margin-bottom:12px">«تحميل نسخة السيرفر» يُسقط تعديلاتك غير المرسلة. «حفظ تعديلاتي» يكتب فوق ما غيّره الآخر.</p>
 <div class="cr" style="border:0;justify-content:flex-start;flex-wrap:wrap"><button class="b1" type="button" data-cf="srv">تحميل نسخة السيرفر</button><button class="b3" type="button" data-cf="mine">حفظ تعديلاتي فوقها</button></div></div></div>
-<div class="modal" id="mCost"><div class="mp mid" style="width:min(660px,94vw)"><div class="mh"><b id="mcT">تكلفة جديدة</b><button class="b2" data-close>إلغاء</button></div>
-<div class="ccF"><label class="w2">الشحنة<select id="cc_ship"></select></label><label>البند<select id="cc_type"></select></label><label>تاريخ التكلفة<input type="date" id="cc_date"></label>
-<label class="w2">البيان<input id="cc_desc"></label><label>المورد / الجهة<input id="cc_sup" list="ccSupL" autocomplete="off"></label><datalist id="ccSupL"></datalist>
-<label>المبلغ<input id="cc_amt" inputmode="decimal" dir="ltr"></label><label>العملة<select id="cc_cur" class="curSel"></select></label>
-<label id="cc_fxw">سعر الصرف<input id="cc_fx" inputmode="decimal" dir="ltr"></label><label id="cc_eqw">أو المعادل بعملة الشحنة<input id="cc_eq" inputmode="decimal" dir="ltr"></label>
-<label class="w2">تُحمَّل على<select id="cc_cid"></select></label>
-<label class="chk"><input type="checkbox" id="cc_pd"> مدفوعة</label><label id="cc_pdw">تاريخ الدفع<input type="date" id="cc_pdd"></label></div>
-<p class="hint" id="cc_hint" style="margin:6px 0"></p><div class="cr" style="border:0"><button class="b1" id="cc_save" type="button">حفظ التكلفة</button><button class="b2" data-close type="button">إلغاء</button></div></div></div>
+<div class="modal" id="mCost"><div class="mp ccm" role="dialog" aria-modal="true" aria-labelledby="mcT">
+<div class="ccm-h"><b id="mcT">تكلفة جديدة</b><button type="button" class="ccm-x" data-close aria-label="إغلاق">✕</button></div>
+<div class="ccm-b">
+<label class="ccm-f">الشحنة<select id="cc_ship"></select></label>
+<div class="ccm-amt"><div class="ccm-amtrow"><input id="cc_amt" inputmode="decimal" dir="ltr" placeholder="0.00" aria-label="المبلغ" autocomplete="off"><select id="cc_cur" class="curSel" aria-label="العملة"></select></div>
+<div class="ccm-fx" id="cc_fxrow"><label id="cc_fxw">سعر الصرف<input id="cc_fx" inputmode="decimal" dir="ltr"></label><label id="cc_eqw">أو المعادل بعملة الشحنة<input id="cc_eq" inputmode="decimal" dir="ltr"></label></div>
+<p class="ccm-hint" id="cc_hint"></p></div>
+<div class="ccm-g"><span class="ccm-l">البند</span><div class="ccm-chips" id="cc_typeC" role="radiogroup"></div><select id="cc_type" hidden></select></div>
+<div class="ccm-2"><label class="ccm-f">المورد / الجهة<input id="cc_sup" list="ccSupL" autocomplete="off"></label><datalist id="ccSupL"></datalist><label class="ccm-f">تاريخ التكلفة<input type="date" id="cc_date"></label></div>
+<label class="ccm-f">البيان<input id="cc_desc" autocomplete="off"></label>
+<div class="ccm-g"><span class="ccm-l">تُحمَّل على</span><div class="ccm-chips" id="cc_cidC" role="radiogroup"></div><select id="cc_cid" hidden></select></div>
+<div class="ccm-pay"><label class="ccm-sw"><input type="checkbox" id="cc_pd"><i aria-hidden="true"></i><span>مدفوعة</span></label><label class="ccm-f" id="cc_pdw">تاريخ الدفع<input type="date" id="cc_pdd"></label></div>
+</div>
+<div class="ccm-ft"><button class="b1" id="cc_save" type="button">حفظ التكلفة</button><button class="b2" data-close type="button">إلغاء</button></div></div></div>
 <div class="modal" id="mIssue"><div class="mp" style="width:min(460px,94vw)"><div class="mh"><b>إصدار الفاتورة؟</b><button class="b2" data-close>إلغاء</button></div>
 <p style="margin:0 0 10px;line-height:1.9">الفاتورة محفوظة كـ<b>مسودة</b>. المسودة لا تدخل في رصيد العميل ولا في كشف حسابه ولا في إيراد الشحنة، ولا يمكن تسجيل دفعات عليها.</p>
 <p class="hint" style="margin-bottom:12px">عند الإصدار تصبح الفاتورة «مرسلة» وتُقفل عن التعديل.</p>
@@ -2208,8 +2239,9 @@ function ccDetail(code){const h0=SHS.get()[code];if(!h0)return '';const h=Object
   const W=shWarn(F,h).filter(w=>!F.autoFr||w.indexOf(_t("أجرة الشحن الدولي محسوبة تلقائياً"))!==0);if(W.length)x+='<ul class="hint" style="margin:8px 0;padding-inline-start:18px">'+W.map(w=>'<li>'+w+'</li>').join('')+'</ul>';
   return x}
 /* ---- نافذة التكلفة ---- */
-function ccFxUI(){const h=SHS.get()[$('cc_ship').value]||{},sc=h.cur||'$',cu=$('cc_cur').value||sc,fo=cu!==sc;$('cc_fxw').style.display=$('cc_eqw').style.display=fo?'':'none';$('cc_hint').textContent=fo?_t("1 وحدة من")+' '+cu+' = ? '+sc:''}
-function ccCidUI(sel){const h=SHS.get()[$('cc_ship').value]||{cons:[]};$('cc_cid').innerHTML=`<option value="">${_t("مشتركة (توزَّع على الحمولات)")}</option>`+(h.cons||[]).map(c=>`<option value="${esc(c.id)}">${esc(c.cust||'—')}</option>`).join('');$('cc_cid').value=sel||''}
+function ccFxUI(){const h=SHS.get()[$('cc_ship').value]||{},sc=h.cur||'$',cu=$('cc_cur').value||sc,fo=cu!==sc;$('cc_fxrow').style.display=fo?'':'none';$('cc_fxw').style.display=$('cc_eqw').style.display=fo?'':'none';$('cc_hint').textContent=fo?_t("1 وحدة من")+' '+cu+' = ? '+sc:''}
+function ccChips(id){const sel=$(id),box=$(id+'C');box.innerHTML=[...sel.options].map(o=>`<button type="button" role="radio" data-v="${esc(o.value)}" aria-checked="${o.value===sel.value}">${esc(o.dataset.s||o.textContent)}</button>`).join('')}
+function ccCidUI(sel){const h=SHS.get()[$('cc_ship').value]||{cons:[]};$('cc_cid').innerHTML=`<option value="" data-s="${_t("مشتركة")}">${_t("مشتركة (توزَّع على الحمولات)")}</option>`+(h.cons||[]).map(c=>`<option value="${esc(c.id)}">${esc(c.cust||'—')}</option>`).join('');$('cc_cid').value=sel||'';ccChips('cc_cid')}
 function ccPdUI(){$('cc_pdw').style.display=$('cc_pd').checked?'':'none'}
 function ccModal(code,id){if(!need('cost'))return;const D=SHS.get(),sh=Object.keys(D).sort().reverse();if(!sh.length){toast(_t("أنشئ شحنة أولاً"),'err');return}
   const x=id?ccLines().find(l=>l.id===id&&l._h===code):null;CCS.ed={code:code||'',id:id||''};
@@ -2220,7 +2252,7 @@ function ccModal(code,id){if(!need('cost'))return;const D=SHS.get(),sh=Object.ke
   $('cc_ship').value=code||sh[0];$('cc_ship').disabled=!!id;const sc=(D[$('cc_ship').value]||{}).cur||'$';
   const set=(k,v)=>{$('cc_'+k).value=v==null?'':v};
   set('type',x?x.type:COSTT[0]);set('date',x?x.date:shToday());set('desc',x?x.desc:'');set('sup',x?x.sup:'');set('amt',x?x.amt:'');set('cur',x?(x.cur||x._c):sc);set('fx',x?x.fx:'');set('eq',x?x.eq:'');
-  ccCidUI(x?x.cid:'');$('cc_pd').checked=!!(x&&x.pd);set('pdd',x?x.pdDate:'');ccPdUI();ccFxUI();
+  ccCidUI(x?x.cid:'');ccChips('cc_type');$('cc_pd').checked=!!(x&&x.pd);set('pdd',x?x.pdDate:'');ccPdUI();ccFxUI();
   document.querySelectorAll('#mCost .bad').forEach(e=>e.classList.remove('bad'));$('mCost').classList.add('on');setTimeout(()=>$('cc_amt').focus(),50)}
 async function ccSaveModal(){if(!need('cost'))return;const code=$('cc_ship').value,h=SHS.get()[code];if(!h){bad($('cc_ship'),_t("اختر الشحنة"));return}
   const amt=num($('cc_amt').value);if(!(amt>0)){bad($('cc_amt'),_t("اكتب مبلغاً أكبر من صفر"));return}
@@ -2276,6 +2308,7 @@ $('cc').addEventListener('click',async e=>{const t=e.target,b=t.closest('[data-c
         for(const c of Object.keys(by)){if(await shPatch(c,d=>{d.costs.forEach(x=>{if(by[c].includes(x.id)){x.pd=true;x.pdDate=shToday();n++}})}));else break}
         if(n){logAct('تسديد تكاليف مورد',sp||'—');toast(_t("تم تسديد")+' '+n+' '+_t("بند"))}ccDraw()}}}});
 $('cc_save').addEventListener('click',ccSaveModal);
+$('mCost').addEventListener('click',e=>{const b=e.target.closest('.ccm-chips button');if(!b)return;const id=b.parentNode.id.slice(0,-1);$(id).value=b.dataset.v;ccChips(id)});
 $('cc_ship').addEventListener('change',()=>{const h=SHS.get()[$('cc_ship').value]||{};$('cc_cur').value=h.cur||'$';ccCidUI('');ccFxUI()});
 $('cc_cur').addEventListener('change',()=>{const h=SHS.get()[$('cc_ship').value]||{},sc=h.cur||'$',cu=$('cc_cur').value;if(cu!==sc&&!num($('cc_fx').value)&&!num($('cc_eq').value)){const sg=curRate(cu,sc);if(sg)$('cc_fx').value=String(sg)}ccFxUI()});
 $('cc_fx').addEventListener('input',()=>{if(num($('cc_fx').value)>0)$('cc_eq').value=''});$('cc_eq').addEventListener('input',()=>{if(num($('cc_eq').value)>0)$('cc_fx').value=''});

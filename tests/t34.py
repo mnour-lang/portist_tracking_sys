@@ -45,7 +45,7 @@ with sync_playwright() as p:
     ok('cost rows listed with 3 lines',pg.evaluate("document.querySelectorAll('#cc tr[data-lid]').length")==3)
     # إضافة تكلفة عبر النافذة
     pg.click('[data-ca=addhere]');pg.wait_for_timeout(200)
-    pg.fill('#cc_amt','50');pg.fill('#cc_sup','مورد س');pg.select_option('#cc_cid','b')
+    pg.fill('#cc_amt','50');pg.fill('#cc_sup','مورد س');pg.click('#cc_cidC [data-v=b]')
     pg.click('#cc_save');pg.wait_for_timeout(700)
     ok('cost added via modal',pg.evaluate("SHS.get()['SH-1'].costs.length")==4 and pg.evaluate("SHS.get()['SH-1'].costs[3].cid")=='b')
     # دفع
