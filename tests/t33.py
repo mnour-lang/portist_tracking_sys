@@ -1,0 +1,16 @@
+import os;APP='file://'+os.environ.get('PST_HTML',os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','portist_invoice.html'))
+from playwright.sync_api import sync_playwright
+ok=lambda n,v:print(('PASS ' if v else 'FAIL ')+n)
+with sync_playwright() as p:
+    b=p.chromium.launch();pg=b.new_page(viewport={'width':1300,'height':900});errs=[];pg.on('pageerror',lambda e:errs.append(str(e)))
+    pg.goto(APP);pg.wait_for_timeout(500)
+    pg.fill('#lgName','م');pg.fill('#lgUser','admin');pg.fill('#lgPass','secret1');pg.fill('#lgPass2','secret1');pg.click('#lgGo');pg.wait_for_timeout(500)
+    pg.evaluate("setMode('c')");pg.click('#cNew');pg.fill('#cf_name','شركة النور');pg.fill('#cf_phone','1');pg.click('#cf_save');pg.wait_for_timeout(200)
+    cid=pg.evaluate("Object.values(CU.get())[0].id")
+    pg.evaluate("""()=>{SHS.set({'SH-1':{code:'SH-1',freight:1000,cur:'$',date:'2026-01-01',st:'ld',hist:[],costs:[],cons:[{id:'a',cust:'شركة النور',cbm:3,pk:5,goods:'x'},{id:'b',cust:'غيره',cbm:1,pk:1,goods:'y'}]}})}""")
+    pg.evaluate("sOpen('%s')"%cid);pg.wait_for_timeout(500)
+    t=pg.inner_text('#spaper')
+    ok('freight column header',('الشحن' in t))
+    ok('customer share 750 shown',('750' in t) and ('250' not in t.split('الشحن')[-1].replace('1,250','')))
+    ok('no page errors',not errs)
+    b.close()
