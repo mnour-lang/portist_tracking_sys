@@ -16,6 +16,21 @@ const { makeHandler } = require('../lib/core');
   ck('open mode (no users) save invoice', (await call({ a: 'save', code: 'PST-0001', isNew: true, d: { rcv: 'x', t: 100, st: 'sent', date: '2026-01-01', cur: '$' } })).ok === 1);
   ck('duplicate isNew => exists', (await call({ a: 'save', code: 'PST-0001', isNew: true, d: { t: 1 } })).err === 'exists');
   ck('next invoice PST-0002', (await call({ a: 'next' })).code === 'PST-0002');
+  // الإشعارات الدائنة: تدخل في حساب حالة الفاتورة الأصلية على الخادم
+  {
+    const base = { rcv: 'n', date: '2026-01-01', cur: '$' };
+    await call({ a: 'save', code: 'PST-8001', isNew: true, d: Object.assign({ t: 500, pd: 0, st: 'sent' }, base) });
+    await call({ a: 'save', code: 'CN-0001', isNew: true, d: Object.assign({ t: -200, st: 'sent', note: 'cr', ref: 'PST-8001', reason: 'r' }, base) });
+    const l = (await call({ a: 'list' })).items.find(x => x.code === 'CN-0001');
+    ck('list exposes note/ref/reason', l && l.note === 'cr' && l.ref === 'PST-8001' && l.reason === 'r');
+    let r = await call({ a: 'adj', code: 'PST-8001', delta: 300, no: 'RC-9', keep: true });
+    ck('paid 300 + credit 200 = settled (paid)', r.d && r.d.st === 'paid');
+    r = await call({ a: 'adj', code: 'PST-8001', delta: -100, no: 'RC-9', keep: true });
+    ck('paid 200 + credit 200 < 500 => partial', r.d && r.d.st === 'partial');
+    await call({ a: 'save', code: 'CN-0001', isNew: false, d: Object.assign({ t: -200, st: 'void', note: 'cr', ref: 'PST-8001', reason: 'r' }, base) });
+    r = await call({ a: 'adj', code: 'PST-8001', delta: 0, no: '', keep: false });
+    ck('void credit note ignored in status', r.d && r.d.st === 'partial' && r.d.pd === 200);
+  }
   ck('bootstrap non-admin refused', !!(await call({ a: 'usave', user: mkU('e', 'emp', 'h2', ['ship']) })).err);
   ck('bootstrap admin ok', (await call({ a: 'usave', user: mkU('a', 'admin', 'h1', [], { admin: true }) })).ok === 1);
   ck('anonymous refused after first user', !!(await call({ a: 'list' })).err);
