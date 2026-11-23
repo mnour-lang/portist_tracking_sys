@@ -24,6 +24,15 @@ with sync_playwright() as p:
     F2=pg.evaluate("shFin(SHS.get()['SH-1'])");ok('equal basis: shared 200 each',F2['per'][0]['shared']==200 and F2['per'][1]['shared']==200)
     pg.evaluate("(()=>{const D=SHS.get();D['SH-1'].costs.push({type:'أجرة الشحن الدولي',amt:900,cur:'$'});SHS.set(D)})()")
     F3=pg.evaluate("shFin(SHS.get()['SH-1'])");ok('manual freight line overrides auto field',not F3['autoFr'] and F3['T']['cost']==1400)
+    # عملات: تكلفة EUR 100 بسعر 1.1، فاتورة EUR 500 (مدفوعة 500) على A
+    pg.evaluate("""()=>{const inv=LS.get('pst_inv',{});inv['F-9']={rcv:'A',st:'issued',t:500,pd:500,cur:'EUR',ship:'SH-1',date:'2026-01-03'};LS.set('pst_inv',inv);ALL={I:inv,Rc:{}};IXV++;
+      const D=SHS.get();D['SH-1'].alloc='cbm';D['SH-1'].costs=[{type:'تخليص جمركي',amt:400,cur:'$',pd:true},{type:'نقل داخلي',amt:100,cur:'$',cid:'b'},{type:'تخزين',amt:100,cur:'EUR'}];SHS.set(D)}""")
+    G=pg.evaluate("shFin(SHS.get()['SH-1'])")
+    ok('no rate: foreign invoice+cost excluded and flagged',G['T']['rev']==2600 and G['T']['cost']==1500 and 'EUR' in G['other'])
+    pg.evaluate("(()=>{const D=SHS.get();D['SH-1'].fxi={'F-9':'1.1'};D['SH-1'].costs[2].fx='1.1';SHS.set(D)})()")
+    G=pg.evaluate("shFin(SHS.get()['SH-1'])")
+    ok('with rates: invoice 550 added, cost 110 added, nothing flagged',G['T']['rev']==3150 and G['T']['col']==1650 and G['T']['cost']==1610 and not G['other'])
+    ok('converted cost line keeps original',any(l.get('orig')==100 and l.get('rate')==1.1 for l in G['lines']))
     # UI
     pg.evaluate("shEdit('SH-1')");pg.wait_for_timeout(400)
     ok('profit table + alloc select + report button',pg.is_visible('#sh_alloc') and pg.is_visible('#sh_prep'))
