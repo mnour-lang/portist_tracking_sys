@@ -29,7 +29,7 @@ with sync_playwright() as p:
     ok('saved rb + rba',c.get('rb') is True and c.get('rba')=='120')
     ok('row tag shown',('نيابة عن العميل' in pg.inner_text('#cc')))
     # الإعدادات
-    pg.evaluate("routeTo('#/settings')");pg.wait_for_timeout(500);pg.select_option('#gRev','inv');pg.wait_for_timeout(200)
+    pg.evaluate("routeTo('#/settings')");pg.wait_for_timeout(500);pg.click('#gNav [data-g=acc]');pg.select_option('#gRev','inv');pg.wait_for_timeout(200)
     ok('settings switch persists policy',pg.evaluate("revPol()")=='inv')
     ok('no page errors',not errs)
     if errs:print(errs)

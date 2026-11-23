@@ -15,7 +15,7 @@ with sync_playwright() as p:
     pg.evaluate("""()=>{const inv={'PST-0001':{rcv:'A',st:'partial',t:1000,pd:660,cur:'$',date:'2026-01-02',offno:'EA-1',ship:'SH-1'},'PST-0002':{rcv:'A',st:'draft',t:50,pd:0,cur:'$',date:'2026-01-05'}};LS.set('pst_inv',inv);
       const rc={'RC-0001':{code:'RC-0001',rcv:'A',from:'A',type:'money',method:'cash',t:600,cur:'€',date:'2026-01-04',st:'valid',alApplied:[{inv:'PST-0001',amt:600,icu:'$',cv:660,rate:'1.1'}],items:[{}]}};LS.set('pst_rc',rc);ALL={I:inv,Rc:rc};IXV++;
       const C=CU.get();C['a']={id:cKey('A'),name:'A',code:'C1'};CU.set(C)}""")
-    pg.evaluate("setClean('i',true);routeTo('#/settings')");pg.wait_for_timeout(500)
+    pg.evaluate("setClean('i',true);routeTo('#/settings')");pg.wait_for_timeout(500);pg.click('#gNav [data-g=acx]')
     ok('export card in nav',pg.evaluate("[...document.querySelectorAll('#gNav button')].some(b=>b.textContent.includes('المحاسب'))"))
     with pg.expect_download() as d: pg.click('[data-acx=inv]')
     r=rows(d.value);ok('invoices csv: header+2 rows, official no and balance',len(r)==3 and r[1][1]=='EA-1' and r[1][10]=='340.0' or r[1][10]=='340')

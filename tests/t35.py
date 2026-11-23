@@ -10,8 +10,10 @@ with sync_playwright() as p:
     # settings table
     pg.evaluate("setMode('g')");pg.wait_for_timeout(300)
     ok('settings has currency table',pg.evaluate("document.querySelectorAll('#gCur tbody tr').length")>=10)
+    pg.click('#gNav [data-g=cur]');pg.click('.gAdd summary');
     pg.fill('#gc_t','AED2');pg.fill('#gc_a','درهم تجريبي');pg.fill('#gc_e','Test Dirham');pg.click('#gc_add');pg.wait_for_timeout(200)
     ok('add currency -> appears in selects',pg.evaluate("[...$('cur').options].some(o=>o.value==='AED2')"))
+    pg.evaluate("document.querySelector('.gAdd').open=true")
     ok('duplicate symbol rejected',(pg.fill('#gc_t','AED2') or True) and (pg.fill('#gc_a','x') or True) and (pg.click('#gc_add') or True) and pg.evaluate("Object.keys(LS.get('pst_curr',{})).filter(k=>k==='AED2').length")==1)
     # deactivate EUR -> hidden from new selects, but legacy value kept
     pg.evaluate("(()=>{const M=curMap();M['€'].on=0;curSave(M)})()")

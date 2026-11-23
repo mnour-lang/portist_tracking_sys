@@ -26,7 +26,9 @@ with sync_playwright() as p:
     pg.click('#tabC');pg.wait_for_timeout(500);ok('customers page',pg.is_visible('#cwrap') and pg.locator('#cList .lsG, #cList > *').count()>=1)
     # settings
     pg.click('#bMore');pg.click('#bSettings');pg.wait_for_timeout(300)
-    ok('settings page',pg.is_visible('#gwrap') and pg.is_visible('#gReset') and pg.is_visible('#bBackup'))
+    ok('settings page',pg.is_visible('#gwrap') and pg.is_visible('#gNav'))
+    pg.click('#gNav [data-g=dat]');ok('backup section reachable',pg.is_visible('#bBackup'))
+    pg.click('#gNav [data-g=dng]');ok('danger section reachable',pg.is_visible('#gReset'))
     ok('menu no longer has backup/users',not pg.evaluate("!!document.querySelector('#moreMenu #bBackup,#moreMenu #bUsers')"))
     # global search
     pg.fill('#gs','BLX9');pg.wait_for_timeout(400);ok('search shipment',pg.locator('#gsBox .gsI').count()==1)
