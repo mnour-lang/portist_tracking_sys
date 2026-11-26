@@ -16,6 +16,57 @@ const { makeHandler } = require('../lib/core');
   ck('open mode (no users) save invoice', (await call({ a: 'save', code: 'PST-0001', isNew: true, d: { rcv: 'x', t: 100, st: 'sent', date: '2026-01-01', cur: '$' } })).ok === 1);
   ck('duplicate isNew => exists', (await call({ a: 'save', code: 'PST-0001', isNew: true, d: { t: 1 } })).err === 'exists');
   ck('next invoice PST-0002', (await call({ a: 'next' })).code === 'PST-0002');
+  // صور الحمولات
+  {
+    const J = 'data:image/jpeg;base64,/9j/4AAQSkZJRg==';
+    await call({ a: 'shsave', code: 'SH-7001', isNew: true, d: { stat: 'ld', cons: [{ id: 'c1', cust: 'x', pk: '1', dl: [] }] } });
+    ck('photo: add', (await call({ a: 'phadd', ship: 'SH-7001', cid: 'c1', name: 'a.jpg', d: J, t: J })).ok === 1);
+    ck('photo: unknown consignment refused', !!(await call({ a: 'phadd', ship: 'SH-7001', cid: 'zz', d: J, t: J })).err);
+    ck('photo: non-jpeg refused', !!(await call({ a: 'phadd', ship: 'SH-7001', cid: 'c1', d: 'data:text/html;base64,AAAA', t: J })).err);
+    const l = (await call({ a: 'phlist', ship: 'SH-7001' })).items;
+    ck('photo: list has 1 without image data', l.length === 1 && l[0].cid === 'c1' && !l[0].d);
+    ck('photo: get full and thumb', (await call({ a: 'phget', id: l[0].id })).d === J && (await call({ a: 'phget', id: l[0].id, th: 1 })).d === J);
+    ck('photo: delete', (await call({ a: 'phdel', id: l[0].id })).ok === 1 && (await call({ a: 'phlist', ship: 'SH-7001' })).items.length === 0);
+    await call({ a: 'phadd', ship: 'SH-7001', cid: 'c1', d: J, t: J });
+    await call({ a: 'shdel', code: 'SH-7001' });
+    ck('photo: removed with the shipment', (await call({ a: 'phlist', ship: 'SH-7001' })).items.length === 0);
+  }
+  // نظام ستوك التصديرات (مستقل)
+  {
+    const inv = (o) => Object.assign({ a: 'xssave', k: 'inv', d: Object.assign({ no: 'A-1', supplier: 'مورد', customer: 'عميل', kind: 'exp', date: '2026-01-10', due: '2026-04-10', cur: 'USD', total: 1000 }, o || {}) });
+    let r = await call(inv());
+    ck('xs: save export-intended invoice', r.ok === 1 && r.d.id === 'XI-0001');
+    ck('xs: duplicate supplier+no refused', !!(await call(inv())).err);
+    ck('xs: customer required', !!(await call(inv({ no: 'A-2', customer: '' }))).err);
+    ck('xs: issue date required', !!(await call(inv({ no: 'A-2', date: '' }))).err);
+    ck('xs: export needs due', !!(await call(inv({ no: 'A-2', due: '' }))).err);
+    r = await call(inv({ no: 'D-1', kind: 'dom', due: '2026-09-09' }));
+    ck('xs: domestic keeps no due', r.ok === 1 && r.d.due === '');
+    const E = (lines, o) => ({ a: 'xssave', k: 'exp', d: Object.assign({ ref: 'SH-X1', date: '2026-02-01', decl: 'D123', lines }, o || {}) });
+    ck('xs: export record rejects domestic invoice', !!(await call(E([{ inv: r.d.id, mode: 'full' }]))).err);
+    ck('xs: partial needs out+rest', !!(await call(E([{ inv: 'XI-0001', mode: 'part', out: 'x' }]))).err);
+    r = await call(E([{ inv: 'XI-0001', mode: 'part', out: '60 كرتون', rest: '40 كرتون' }]));
+    ck('xs: save export record XE-0001', r.ok === 1 && r.d.id === 'XE-0001');
+    ck('xs: list returns both', (await call({ a: 'xslist' })).exp.length === 1 && (await call({ a: 'xslist' })).inv.length === 2);
+    ck('xs: cannot delete invoice used in a record', !!(await call({ a: 'xsdel', k: 'inv', id: 'XI-0001' })).err);
+    ck('xs: cannot change kind of used invoice', !!(await call(Object.assign(inv({ kind: 'dom' }), { id: 'XI-0001' }))).err);
+    r = await call({ a: 'xsclose', id: 'XI-0001', how: 'local', note: 'حُوّل' });
+    ck('xs: close invoice', r.ok === 1 && r.d.closed && r.d.closed.how === 'local');
+    r = await call({ a: 'xsclose', id: 'XI-0001', open: 1 });
+    ck('xs: reopen invoice', r.ok === 1 && !r.d.closed);
+    const J = Buffer.from('%PDF-1.4 test').toString('base64');
+    r = await call({ a: 'xsfput', name: 'a.pdf', mime: 'application/pdf', d: J });
+    ck('xs: file upload', r.ok === 1);
+    ck('xs: bad mime refused', !!(await call({ a: 'xsfput', name: 'a.exe', mime: 'application/x-msdownload', d: J })).err);
+    const fid = r.file.id;
+    await call({ a: 'xssave', k: 'exp', id: 'XE-0001', d: Object.assign(E([{ inv: 'XI-0001', mode: 'full' }]).d, { files: [r.file], ver: 1 }) });
+    ck('xs: file attached then readable', (await call({ a: 'xsfget', id: fid })).d === J);
+    ck('xs: stale ver => conflict', (await call({ a: 'xssave', k: 'exp', id: 'XE-0001', d: Object.assign(E([{ inv: 'XI-0001', mode: 'full' }]).d, { ver: 1 }) })).err === 'conflict');
+    ck('xs: delete export record removes its file', (await call({ a: 'xsdel', k: 'exp', id: 'XE-0001' })).ok === 1 && !!(await call({ a: 'xsfget', id: fid })).err);
+    ck('xs: now invoice deletable', (await call({ a: 'xsdel', k: 'inv', id: 'XI-0001' })).ok === 1);
+    // استقلال: لا يظهر شيء من ستوك التصديرات في فواتير النظام أو شحناته
+    ck('xs: independent from main invoices/shipments', (await call({ a: 'list' })).items.every(x => !/^XI-/.test(x.code)) && (await call({ a: 'shlist' })).items.every(x => !/^X[IE]-/.test(x.code)));
+  }
   // الإشعارات الدائنة: تدخل في حساب حالة الفاتورة الأصلية على الخادم
   {
     const base = { rcv: 'n', date: '2026-01-01', cur: '$' };

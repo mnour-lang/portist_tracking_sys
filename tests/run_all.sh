@@ -11,4 +11,10 @@ kill $S 2>/dev/null
 PORT=8790 APP_PASSWORD=k node devserver.js >/dev/null 2>&1 & D=$!; sleep 3
 echo "== e3 (Postgres, two browsers)"; python3 e3.py 2>&1 | tee /tmp/_t.log | grep -E "FAIL|Traceback|Error" && fail=1
 kill $D 2>/dev/null
+PORT=8790 APP_PASSWORD=k node devserver.js >/dev/null 2>&1 & D=$!; sleep 3
+echo "== t47 (photos)"; python3 t47.py 2>&1 | tee /tmp/_t.log | grep -E "FAIL|Traceback|Error" && fail=1
+kill $D 2>/dev/null
+PORT=8790 APP_PASSWORD=k node devserver.js >/dev/null 2>&1 & D=$!; sleep 3
+echo "== t48 (export stock)"; python3 t48.py 2>&1 | tee /tmp/_t.log | grep -E "FAIL|Traceback|Error" && fail=1
+kill $D 2>/dev/null
 [ $fail = 0 ] && echo "ALL OK" || { echo "SOME FAILED"; exit 1; }
