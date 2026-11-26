@@ -80,6 +80,8 @@ with sync_playwright() as p:
     ok('invoice used in a record cannot be deleted',A.evaluate("XS.inv.some(v=>v.id==='XI-0002')")); A.evaluate("$('mXi').classList.remove('on')")
     # independence from the main system
     ok('main invoices/shipments untouched',A.evaluate("Object.keys(SHS.get()).length===0&&Object.keys(LS.get('pst_inv',{})).length===0"))
+    msg=A.evaluate("(()=>{const k=XS.inv;XS.inv=k.filter(v=>v.kind==='dom');XE={lines:[]};XP={q:'',sel:{}};const m=xsPickEmpty();XS.inv=k;return m})()")
+    ok('empty picker explains domestic-only case',('مبيعات داخلية' in msg) and ('1' in msg))
     # reload keeps data + route
     A.reload();A.wait_for_timeout(2000)
     A.evaluate("routeTo('#/exports')");A.wait_for_timeout(1200)
