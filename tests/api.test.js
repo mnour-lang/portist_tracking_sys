@@ -61,6 +61,20 @@ const { makeHandler } = require('../lib/core');
     await call({ a: 'xssave', k: 'exp', id: 'XE-0001', d: Object.assign(E([{ inv: 'XI-0001', mode: 'full' }]).d, { files: [r.file], ver: 1 }) });
     ck('xs: file attached then readable', (await call({ a: 'xsfget', id: fid })).d === J);
     ck('xs: stale ver => conflict', (await call({ a: 'xssave', k: 'exp', id: 'XE-0001', d: Object.assign(E([{ inv: 'XI-0001', mode: 'full' }]).d, { ver: 1 }) })).err === 'conflict');
+    {
+      const cur = (await call({ a: 'xslist' })).exp.find(x => x.id === 'XE-0001');
+      let r = await call({ a: 'xspost', id: 'XE-0001', post: 1 });
+      ck('xs: post locks the record', r.ok === 1 && r.d.posted === true && !!r.d.postedAt);
+      r = await call({ a: 'xssave', k: 'exp', id: 'XE-0001', d: Object.assign({}, cur, { ref: 'HACK', decl: 'DECL-1', lines: [], ver: r.d.ver }) });
+      ck('xs: posted record only accepts declaration/notes/files', r.ok === 1 && r.d.decl === 'DECL-1' && r.d.ref !== 'HACK' && r.d.lines.length === 1);
+      ck('xs: posted record cannot be deleted', !!(await call({ a: 'xsdel', k: 'exp', id: 'XE-0001' })).err);
+      const e2 = await call({ a: 'xssave', k: 'exp', d: { ref: 'SH-2', date: '2026-03-01', lines: [{ inv: 'XI-0001', mode: 'full' }] } });
+      ck('xs: second draft can hold the same invoice', e2.ok === 1);
+      ck('xs: cannot post when the invoice is already fully exported', !!(await call({ a: 'xspost', id: e2.d.id, post: 1 })).err);
+      await call({ a: 'xsdel', k: 'exp', id: e2.d.id });
+      r = await call({ a: 'xspost', id: 'XE-0001', post: 0 });
+      ck('xs: unpost', r.ok === 1 && !r.d.posted);
+    }
     ck('xs: delete export record removes its file', (await call({ a: 'xsdel', k: 'exp', id: 'XE-0001' })).ok === 1 && !!(await call({ a: 'xsfget', id: fid })).err);
     ck('xs: now invoice deletable', (await call({ a: 'xsdel', k: 'inv', id: 'XI-0001' })).ok === 1);
     // استقلال: لا يظهر شيء من ستوك التصديرات في فواتير النظام أو شحناته

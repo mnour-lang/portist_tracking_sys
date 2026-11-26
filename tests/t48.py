@@ -53,17 +53,40 @@ with sync_playwright() as p:
     A.locator('#xeLines .xsLine[data-i="%d"] [data-xl=rest]'%pi).fill('40 كرتون')
     ok('declaration number optional (empty is fine)',A.evaluate("$('xeDecl').value===''") or True)
     A.click('[data-xa=se]');A.wait_for_timeout(800)
+    ok('after first save the form stays open with the post button',A.evaluate("$('mXe').classList.contains('on')&&!!document.querySelector('[data-xa=po]')"))
+    A.evaluate("$('mXe').classList.remove('on')")
     ok('saved without customs declaration',A.evaluate("XS.exp.length===1&&XS.exp[0].decl===''"))
     ok('export record saved XE-0001 with 2 lines',A.evaluate("XS.exp.length===1&&XS.exp[0].id==='XE-0001'&&XS.exp[0].lines.length===2"))
     st=A.evaluate("XS.inv.slice(0,4).map(v=>xsInfo(v).st)")
-    ok('statuses: full / part / none / none',st==['full','part','none','none'])
+    ok('draft record does not count: all statuses still none',st==['none','none','none','none'])
+    ok('alerts unchanged while record is a draft',A.evaluate("$('sd_x').querySelector('.xsN').textContent")=='3')
+    # add E-3 to the open draft from the invoices table
+    A.click('[data-xt=inv]');A.wait_for_timeout(200)
+    ok('invoice in draft shows its record tag instead of add button',A.evaluate("document.querySelector('tr .xsDr')&&document.querySelectorAll('[data-xa=at]').length===3"))
+    A.locator('[data-xa=at][data-id=XI-0003]').click();A.wait_for_timeout(300)
+    ok('add dialog lists the open draft',A.evaluate("[...$('xaRec').options].map(o=>o.value).join()")=='XE-0001')
+    A.click('[data-xa=ad]');A.wait_for_timeout(700)
+    ok('E-3 added to the draft record',A.evaluate("XS.exp[0].lines.length===3&&!XS.exp[0].posted"))
+    # picker must not offer invoices that sit in another open record
+    A.evaluate("xsExpOpen()");A.wait_for_timeout(200);A.click('[data-xa=pk]');A.wait_for_timeout(200)
+    ok('invoices in another open record not offered',A.evaluate("[...document.querySelectorAll('#xpL .xpRow')].map(r=>r.dataset.id).sort().join()")=='XI-0004,XI-0005')
+    A.evaluate("$('mXp').classList.remove('on');$('mXe').classList.remove('on')")
+    # post and lock
+    A.evaluate("xsExpOpen('XE-0001')");A.wait_for_timeout(200)
+    A.click('[data-xa=po]');A.click('[data-xa=po]');A.wait_for_timeout(900)
+    ok('record posted and locked',A.evaluate("XS.exp[0].posted===true&&XE.posted&&$('xeRef').disabled&&!document.querySelector('[data-xa=pk]')"))
+    st=A.evaluate("XS.inv.slice(0,4).map(v=>xsInfo(v).st)")
+    ok('after posting: statuses full / part / full / none',st==['full','part','full','none'])
     ok('remaining note surfaced',A.evaluate("xsInfo(XS.inv[1]).rest")=='40 كرتون')
+    ok('alerts now only E-2 (part) and E-4',A.evaluate("$('sd_x').querySelector('.xsN').textContent")=='2')
+    A.fill('#xeDecl','D-99');A.click('[data-xa=se]');A.wait_for_timeout(700)
+    ok('declaration number added after posting',A.evaluate("XS.exp[0].decl==='D-99'&&XS.exp[0].posted===true&&XS.exp[0].lines.length===3"))
+    A.evaluate("xsExpOpen('XE-0001')");A.wait_for_timeout(200)
+    A.click('[data-xa=de]') if A.locator('[data-xa=de]').count() else None
+    ok('posted record has no delete button',A.locator('[data-xa=de]').count()==0)
+    A.evaluate("$('mXe').classList.remove('on')")
     A.click('[data-xt=exp]');A.wait_for_timeout(300)
     ok('records tab shows exported + remaining',A.evaluate("document.querySelector('#xs').innerText.includes('40 كرتون')&&document.querySelector('#xs').innerText.includes('60 كرتون')"))
-    A.evaluate("xsExpOpen('XE-0001')");A.wait_for_timeout(200);A.click('[data-xa=pk]');A.wait_for_timeout(200)
-    ok('after export, full/used invoices are not offered again',A.evaluate("[...document.querySelectorAll('#xpL .xpRow')].map(r=>r.dataset.id).sort().join()")=='XI-0003,XI-0004,XI-0005')
-    A.evaluate("$('mXp').classList.remove('on')");A.fill('#xeDecl','D-99');A.click('[data-xa=se]');A.wait_for_timeout(700)
-    ok('declaration number added later',A.evaluate("XS.exp[0].decl==='D-99'"))
     # file upload on invoice
     A.click('[data-xt=inv]');A.wait_for_timeout(200);A.evaluate("xsInvOpen('XI-0001')");A.wait_for_timeout(200)
     with A.expect_file_chooser() as fc:A.click('#mXi [data-xa=fi]')
@@ -74,7 +97,7 @@ with sync_playwright() as p:
     # close invoice manually
     A.evaluate("xsInvOpen('XI-0004')");A.wait_for_timeout(200);A.fill('#xiClN','حُوِّل لبيع محلي');A.click('[data-xa=cl]');A.wait_for_timeout(600)
     ok('closed invoice leaves alerts',A.evaluate("xsInfo(XS.inv[3]).st==='closed'&&xsInfo(XS.inv[3]).al===''")); A.evaluate("$('mXi').classList.remove('on')")
-    ok('badge now 2',A.evaluate("$('sd_x').querySelector('.xsN').textContent")=='2')
+    ok('badge now 1',A.evaluate("$('sd_x').querySelector('.xsN').textContent")=='1')
     # cannot delete an invoice used by a record
     A.evaluate("xsInvOpen('XI-0002')");A.wait_for_timeout(200);A.click('[data-xa=di]');A.click('[data-xa=di]');A.wait_for_timeout(600)
     ok('invoice used in a record cannot be deleted',A.evaluate("XS.inv.some(v=>v.id==='XI-0002')")); A.evaluate("$('mXi').classList.remove('on')")
@@ -82,7 +105,7 @@ with sync_playwright() as p:
     ok('main invoices/shipments untouched',A.evaluate("Object.keys(SHS.get()).length===0&&Object.keys(LS.get('pst_inv',{})).length===0"))
     # فاتورة داخلية تُصدَّر أيضاً لكن بلا مهلة ولا تنبيه
     A.evaluate("xsExpOpen()");A.wait_for_timeout(200);A.fill('#xeRef','CONT-DOM');A.click('[data-xa=pk]');A.wait_for_timeout(200)
-    A.locator('#xpL .xpRow[data-id=XI-0005] input[type=checkbox]').check();A.click('#xpOk');A.wait_for_timeout(200);A.click('[data-xa=se]');A.wait_for_timeout(700)
+    A.locator('#xpL .xpRow[data-id=XI-0005] input[type=checkbox]').check();A.click('#xpOk');A.wait_for_timeout(200);A.click('[data-xa=se]');A.wait_for_timeout(700);A.click('[data-xa=po]');A.click('[data-xa=po]');A.wait_for_timeout(900)
     ok('domestic invoice exported: status full, no alert',A.evaluate("(()=>{const i=xsInfo(XS.inv[4]);return i.st==='full'&&i.al===''&&i.left===null})()"))
     # reload keeps data + route
     A.reload();A.wait_for_timeout(2000)
