@@ -43,13 +43,12 @@ const { makeHandler } = require('../lib/core');
     r = await call(inv({ no: 'D-1', kind: 'dom', due: '2026-09-09' }));
     ck('xs: domestic keeps no due', r.ok === 1 && r.d.due === '');
     const E = (lines, o) => ({ a: 'xssave', k: 'exp', d: Object.assign({ ref: 'SH-X1', date: '2026-02-01', decl: 'D123', lines }, o || {}) });
-    ck('xs: export record rejects domestic invoice', !!(await call(E([{ inv: r.d.id, mode: 'full' }]))).err);
+    { const x = await call(E([{ inv: r.d.id, mode: 'full' }])); ck('xs: domestic invoice can be exported too', x.ok === 1); await call({ a: 'xsdel', k: 'exp', id: x.d.id }); }
     ck('xs: partial needs out+rest', !!(await call(E([{ inv: 'XI-0001', mode: 'part', out: 'x' }]))).err);
     r = await call(E([{ inv: 'XI-0001', mode: 'part', out: '60 كرتون', rest: '40 كرتون' }]));
     ck('xs: save export record XE-0001', r.ok === 1 && r.d.id === 'XE-0001');
     ck('xs: list returns both', (await call({ a: 'xslist' })).exp.length === 1 && (await call({ a: 'xslist' })).inv.length === 2);
     ck('xs: cannot delete invoice used in a record', !!(await call({ a: 'xsdel', k: 'inv', id: 'XI-0001' })).err);
-    ck('xs: cannot change kind of used invoice', !!(await call(Object.assign(inv({ kind: 'dom' }), { id: 'XI-0001' }))).err);
     r = await call({ a: 'xsclose', id: 'XI-0001', how: 'local', note: 'حُوّل' });
     ck('xs: close invoice', r.ok === 1 && r.d.closed && r.d.closed.how === 'local');
     r = await call({ a: 'xsclose', id: 'XI-0001', open: 1 });

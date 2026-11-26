@@ -36,7 +36,7 @@ with sync_playwright() as p:
     # export record: partial for E-2, full for E-1
     A.click('[data-xa=ne]');A.wait_for_timeout(200);A.fill('#xeRef','CONT-123');A.fill('#xeDate',iso(T));
     A.click('[data-xa=pk]');A.wait_for_timeout(200)
-    ok('picker lists open export invoices only (4, not domestic)',A.locator('#xpL .xpRow').count()==4)
+    ok('picker lists all open invoices of both types (5)',A.locator('#xpL .xpRow').count()==5)
     A.fill('#xpQ','عميل 2');A.wait_for_timeout(200)
     ok('search by customer name filters',A.locator('#xpL .xpRow').count()==2)
     A.fill('#xpQ','e-2');A.wait_for_timeout(200)
@@ -61,7 +61,7 @@ with sync_playwright() as p:
     A.click('[data-xt=exp]');A.wait_for_timeout(300)
     ok('records tab shows exported + remaining',A.evaluate("document.querySelector('#xs').innerText.includes('40 كرتون')&&document.querySelector('#xs').innerText.includes('60 كرتون')"))
     A.evaluate("xsExpOpen('XE-0001')");A.wait_for_timeout(200);A.click('[data-xa=pk]');A.wait_for_timeout(200)
-    ok('after export, full/used invoices are not offered again',A.evaluate("[...document.querySelectorAll('#xpL .xpRow')].map(r=>r.dataset.id).sort().join()")=='XI-0003,XI-0004')
+    ok('after export, full/used invoices are not offered again',A.evaluate("[...document.querySelectorAll('#xpL .xpRow')].map(r=>r.dataset.id).sort().join()")=='XI-0003,XI-0004,XI-0005')
     A.evaluate("$('mXp').classList.remove('on')");A.fill('#xeDecl','D-99');A.click('[data-xa=se]');A.wait_for_timeout(700)
     ok('declaration number added later',A.evaluate("XS.exp[0].decl==='D-99'"))
     # file upload on invoice
@@ -80,11 +80,13 @@ with sync_playwright() as p:
     ok('invoice used in a record cannot be deleted',A.evaluate("XS.inv.some(v=>v.id==='XI-0002')")); A.evaluate("$('mXi').classList.remove('on')")
     # independence from the main system
     ok('main invoices/shipments untouched',A.evaluate("Object.keys(SHS.get()).length===0&&Object.keys(LS.get('pst_inv',{})).length===0"))
-    msg=A.evaluate("(()=>{const k=XS.inv;XS.inv=k.filter(v=>v.kind==='dom');XE={lines:[]};XP={q:'',sel:{}};const m=xsPickEmpty();XS.inv=k;return m})()")
-    ok('empty picker explains domestic-only case',('مبيعات داخلية' in msg) and ('1' in msg))
+    # فاتورة داخلية تُصدَّر أيضاً لكن بلا مهلة ولا تنبيه
+    A.evaluate("xsExpOpen()");A.wait_for_timeout(200);A.fill('#xeRef','CONT-DOM');A.click('[data-xa=pk]');A.wait_for_timeout(200)
+    A.locator('#xpL .xpRow[data-id=XI-0005] input[type=checkbox]').check();A.click('#xpOk');A.wait_for_timeout(200);A.click('[data-xa=se]');A.wait_for_timeout(700)
+    ok('domestic invoice exported: status full, no alert',A.evaluate("(()=>{const i=xsInfo(XS.inv[4]);return i.st==='full'&&i.al===''&&i.left===null})()"))
     # reload keeps data + route
     A.reload();A.wait_for_timeout(2000)
     A.evaluate("routeTo('#/exports')");A.wait_for_timeout(1200)
-    ok('after reload data is back from server',A.evaluate("XS.inv.length===5&&XS.exp.length===1"))
+    ok('after reload data is back from server',A.evaluate("XS.inv.length===5&&XS.exp.length===2"))
     # lang EN
     ok('no page errors',not errs)
