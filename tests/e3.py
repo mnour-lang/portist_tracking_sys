@@ -30,7 +30,10 @@ with sync_playwright() as p:
     ok('B: wrong password refused',B.evaluate("!ME"))
     B.fill('#lgPass','secret1');B.click('#lgGo');B.wait_for_timeout(2000)
     ok('B: signed in from another browser with email + password only',B.evaluate("!!ME&&ME.user==='admin@portist.com'&&CL.u()==='/api'"))
-    B.reload();B.wait_for_timeout(1500)
+    B.reload();
+    try:B.wait_for_function('typeof ME!=="undefined"&&!!ME',timeout=15000)
+    except Exception:pass
+    B.wait_for_timeout(500)
     ok('B: session restored after reload',B.evaluate("!!ME"))
     B.evaluate("shOpen()");B.wait_for_timeout(1200)
     ok('B: sees the shipment created on A',B.evaluate("Object.keys(SHS.get()).includes('%s')"%code))

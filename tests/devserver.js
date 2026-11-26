@@ -5,7 +5,7 @@ const { PGlite } = require('@electric-sql/pglite');
 const { makeHandler } = require('../lib/core');
 (async () => {
   const pg = new PGlite();
-  const H = makeHandler({ sql: async (t, p) => (await pg.query(t, p || [])).rows, env: { APP_PASSWORD: process.env.APP_PASSWORD || 'k', __TEST: 1 } });
+  const H = makeHandler({ sql: async (t, p) => (await pg.query(t, p || [])).rows, env: { APP_PASSWORD: process.env.APP_PASSWORD || 'k', __TEST: 1, STRICT_AUTH: '1' } });
   const page = fs.readFileSync(path.join(__dirname, '..', 'public', 'index.html'));
   http.createServer((req, res) => {
     if (req.url.split('?')[0] === '/api') return H.handler(req, res);

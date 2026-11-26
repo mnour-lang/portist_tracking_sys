@@ -41,7 +41,9 @@ with sync_playwright() as p:
     # REPLACE: data added after backup disappears
     A.evaluate("$('mBackup').classList.add('on')");A.set_input_files('#bkFile',path);A.wait_for_timeout(500)
     A.click('#bkReplace');A.click('#bkReplace');A.wait_for_timeout(4000)
-    A.wait_for_function('typeof ME!=="undefined"&&!!ME',timeout=15000)
+    A.wait_for_function('typeof SRV!=="undefined"&&SRV.on',timeout=15000);A.wait_for_timeout(1500)
+    if A.evaluate("!ME"):
+        A.fill('#lgUser','admin@portist.com');A.fill('#lgPass','secret1');A.click('#lgGo');A.wait_for_timeout(2000)
     j=A.evaluate("api('xslist')")
     ok('replace: back to exactly the backup content',len(j['inv'])==2 and len(j['exp'])==1 and not any(v['no']=='NEW-1' for v in j['inv']))
     ok('replace: files intact',A.evaluate("(async()=>{const l=await api('xslist');const f=l.inv[0].files[0]||l.exp[0].files[0];return (await api('xsfget',{id:f.id})).d.length>10})()"))

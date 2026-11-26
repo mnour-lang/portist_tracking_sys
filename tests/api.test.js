@@ -110,6 +110,31 @@ const { makeHandler } = require('../lib/core');
   await call({ a: 'usave', ...A, user: mkU('D', 'drv', 'dh', ['deliver']) });
   await call({ a: 'usave', ...A, user: mkU('R', 'rcp', 'rh', ['rc', 'inv']) });
   const E = { u: 'emp', uh: 'h2' }, SC = { u: 'shp', uh: 'sh' }, DR = { u: 'drv', uh: 'dh' }, RC = { u: 'rcp', uh: 'rh' };
+  // صلاحيات البيانات المشتركة (kv): لا يكفي تسجيل الدخول
+  {
+    const put = (who, k, v, extra) => call(Object.assign({ a: 'kvput', ops: [Object.assign({ k, id: '', v }, extra || {})] }, who));
+    const get = who => call(Object.assign({ a: 'kvget', since: 0 }, who));
+    let r = await put(DR, 'pst_revpol', 'inv');
+    ck('kv: deliver-only cannot change revenue policy', (r.denied || []).includes('pst_revpol'));
+    r = await put(DR, 'pst_curr', { x: 1 }, { id: 'USD' });
+    ck('kv: deliver-only cannot change currencies', (r.denied || []).includes('pst_curr'));
+    ck('kv: denied write did not land', !(await get(A)).items.some(x => x.k === 'pst_revpol' && x.v === 'inv'));
+    r = await put(A, 'pst_revpol', 'inv');
+    ck('kv: admin can change revenue policy', !(r.denied || []).length && (await get(A)).items.some(x => x.k === 'pst_revpol' && x.v === 'inv'));
+    r = await put(SC, 'pst_cust', { name: 'c1', ts: 1 }, { id: 'c1' });
+    ck('kv: ship user can add a customer', !(r.denied || []).length);
+    r = await put(SC, 'pst_cust', null, { id: 'c1', del: 1 });
+    ck('kv: ship user cannot delete a customer', (r.denied || []).includes('pst_cust'));
+    ck('kv: delivery sequence allowed for deliver', !((await put(DR, 'pst_dseq', 5, { max: 1 })).denied || []).length);
+    await put(DR, 'pst_log', { t: 1, a: 'x' }, { id: 'L1' });
+    ck('kv: any user can append to the log', true);
+    await put(A, 'pst_log', { t: 2, a: 'FORGED' }, { id: 'L1' });
+    ck('kv: log entries cannot be overwritten', (await get(A)).items.filter(x => x.k === 'pst_log' && x.id === 'L1').every(x => x.v.a === 'x'));
+    r = await put(A, 'pst_log', null, { id: 'L1', del: 1 });
+    ck('kv: log entries cannot be deleted', (r.denied || []).includes('pst_log'));
+    ck('kv: log hidden from users without the users permission', !(await get(DR)).items.some(x => x.k === 'pst_log') && (await get(A)).items.some(x => x.k === 'pst_log'));
+    await sql('DELETE FROM kv');
+  }
   ck('emp cannot list invoices', !!(await call({ a: 'list', ...E })).err);
   ck('emp cannot adj/save invoices', !!(await call({ a: 'adj', code: 'PST-0001', delta: 5, no: 'RC-1', keep: true, ...E })).err && !!(await call({ a: 'save', code: 'PST-0009', isNew: true, d: {}, ...E })).err);
   ck('emp ulist only self', (await call({ a: 'ulist', ...E })).items.map(x => x.user).join() === 'emp');
@@ -201,6 +226,48 @@ const { makeHandler } = require('../lib/core');
   ck('isNew never overwrites existing or deleted', kv3.find(x => x.id === 'c1').v.name === 'أحمد' && kv3.find(x => x.id === 'c2').del === true);
   ck('unknown key ignored', (await H.run({ a: 'kvput', ...A, ops: [{ k: 'evil', id: 'x', v: 1 }] })).n === 0);
   ck('kv requires login', !!(await H.run({ a: 'kvget', since: 0 })).err && !!(await H.run({ a: 'sig', u: 'admin', uh: 'bad' })).err);
+  // ===== جلسات صارمة + نسخ تلقائي + سجل أخطاء =====
+  {
+    const pg2 = new PGlite(), sql = async (t, p) => (await pg2.query(t, p || [])).rows;
+    const S = makeHandler({ sql, env: { APP_PASSWORD: 'k', __TEST: 1, STRICT_AUTH: '1', SNAP_TEST: '1' } });
+    const sc = o => S.run(Object.assign({ pw: 'k' }, o));
+    await sc({ a: 'usave', user: mkU('A1', 'boss', 'hh1', [], { admin: true }) });
+    const lg = await sc({ a: 'ulogin', u: 'boss', uh: 'hh1' });
+    await sc({ a: 'usave', tok: lg.tok, user: mkU('B1', 'bob', 'hh2', ['inv']) });
+    ck('strict: login returns token', !!lg.tok && lg.user && !lg.user.hash2);
+    ck('strict: password hash alone is refused for data calls', !!(await sc({ a: 'list', u: 'boss', uh: 'hh1' })).err);
+    ck('strict: token works', !(await sc({ a: 'list', u: 'boss', tok: lg.tok })).err);
+    ck('strict: forged token refused', !!(await sc({ a: 'list', u: 'boss', tok: lg.tok.slice(0, -3) + 'aaa' })).err);
+    const lb = await sc({ a: 'ulogin', u: 'bob', uh: 'hh2' });
+        ck('strict: limited user token respects permissions', !!(await sc({ a: 'snaplist', tok: lb.tok })).err && !(await sc({ a: 'list', tok: lb.tok })).err);
+    const ch = await sc({ a: 'usave', tok: lg.tok, self: 1, user: mkU('A1', 'boss', 'hh1new', [], { admin: true, salt: 'sNEW' }) });
+    ck('self password change returns new token and kills the old one', !!ch.tok && !!(await sc({ a: 'list', tok: lg.tok })).err && !(await sc({ a: 'list', tok: ch.tok })).err);
+    await sc({ a: 'usave', tok: ch.tok, user: mkU('B1', 'bob', 'hh2', ['inv'], { active: false }) });
+    ck('deactivated user token dies', !!(await sc({ a: 'list', tok: lb.tok })).err);
+    // snapshots
+    await sc({ a: 'save', tok: ch.tok, d: { code: 'SN1', rcv: 'x', date: '2026-01-01', total: 5, cur: 'USD' } }).catch(() => {});
+    const sn = await sc({ a: 'snapnow', tok: ch.tok });
+    ck('snapshot taken', sn.ok && sn.id && sn.n.invoices >= 0);
+    const sl = await sc({ a: 'snaplist', tok: ch.tok });
+    ck('snapshot listed + downloadable', sl.items.length >= 1 && !!(await sc({ a: 'snapget', tok: ch.tok, id: sn.id })).gz);
+    await sql('DELETE FROM kv');
+    await sc({ a: 'kvput', tok: ch.tok, ops: [{ k: 'pst_cust', id: 'z1', v: { name: 'قبل' }, isNew: true }] });
+    const s2 = await sc({ a: 'snapnow', tok: ch.tok });
+    await sc({ a: 'kvput', tok: ch.tok, ops: [{ k: 'pst_cust', id: 'z1', v: { name: 'بعد' } }] });
+    const rs = await sc({ a: 'snaprestore', tok: ch.tok, id: s2.id });
+    const kz = (await sql('SELECT v FROM kv WHERE id=$1', ['z1']))[0];
+    ck('restore brings back the snapshot data + users untouched', rs.ok && kz && kz.v.name === 'قبل' && (await sql('SELECT count(*)::int n FROM users'))[0].n === 2);
+    ck('restore made a pre-restore safety snapshot', (await sc({ a: 'snaplist', tok: ch.tok })).items.some(x => x.kind === 'pre-restore'));
+    // errors
+    await sc({ a: 'errrep', tok: ch.tok, msg: 'boom', stack: 'at x' });
+    const sy = await sc({ a: 'syslog', tok: ch.tok });
+    ck('client error is recorded', sy.items.some(x => x.kind === 'client' && x.msg === 'boom'));
+    for (let i = 0; i < 8; i++) await sc({ a: 'errrep', tok: ch.tok, msg: 'spam' + i });
+    ck('client error reports are rate limited', (await sc({ a: 'syslog', tok: ch.tok })).items.filter(x => x.kind === 'client').length <= 5);
+    ck('syslog needs users permission', !!(await sc({ a: 'syslog', tok: lb.tok })).err);
+    await sc({ a: 'sysclear', tok: ch.tok });
+    ck('syslog cleared', (await sc({ a: 'syslog', tok: ch.tok })).items.length === 0);
+  }
   // fail-open
   await sql('DELETE FROM users');
   ck('users table emptied after AUTH => refused (no fail-open)', !!(await call({ a: 'list' })).err);

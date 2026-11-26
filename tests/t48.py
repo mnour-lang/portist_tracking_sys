@@ -108,8 +108,8 @@ with sync_playwright() as p:
     A.locator('#xpL .xpRow[data-id=XI-0005] input[type=checkbox]').check();A.click('#xpOk');A.wait_for_timeout(200);A.click('[data-xa=se]');A.wait_for_timeout(700);A.click('[data-xa=po]');A.click('[data-xa=po]');A.wait_for_timeout(900)
     ok('domestic invoice exported: status full, no alert',A.evaluate("(()=>{const i=xsInfo(XS.inv[4]);return i.st==='full'&&i.al===''&&i.left===null})()"))
     # reload keeps data + route
-    A.reload();A.wait_for_timeout(2000)
-    A.evaluate("routeTo('#/exports')");A.wait_for_timeout(1200)
+    A.reload();A.wait_for_function('typeof ME!=="undefined"&&!!ME',timeout=20000);A.wait_for_timeout(2500)
+    A.evaluate("routeTo('#/exports')");A.wait_for_function('XS.inv.length>=5',timeout=15000);A.wait_for_timeout(500)
     ok('after reload data is back from server',A.evaluate("XS.inv.length===5&&XS.exp.length===2"))
     # lang EN
     ok('no page errors',not errs)
