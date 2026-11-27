@@ -3,15 +3,20 @@
  window.addEventListener('error',e=>rep(e.message,(e.filename||'')+':'+e.lineno+':'+e.colno));
  window.addEventListener('unhandledrejection',e=>{const x=e.reason;rep(x&&x.message||x,x&&x.stack)})}
 const fmtTs=t=>new Date(t).toLocaleString('en-GB',{dateStyle:'short',timeStyle:'short'});
-async function snDraw(){const L=$('snList');if(!L||!SRV.on)return;L.innerHTML='<p class="hint">'+_t('جارٍ التحميل')+'...</p>';
+async function blDraw(){const B=$('snBlob');if(!B||!SRV.on)return;
+  try{const j=await api('blobstat'),n=(j.photos||0)+(j.files||0);
+    B.innerHTML='<b>'+_t('تخزين الملفات')+'</b><p class="hint" style="margin:4px 0 8px">'+(j.on?esc(_t('صور البضاعة وملفات التصدير تُحفظ في تخزين خاص (Vercel Blob) خارج قاعدة البيانات.')):esc(_t('تخزين Blob غير مفعّل: الملفات تُحفظ داخل قاعدة البيانات.')))+(j.on?' — '+esc(String(j.inBlob||0))+' '+_t('ملف في Blob'):'')+'</p>'+(j.on&&n?`<button class="b2" id="blMig" type="button">${_t('نقل الملفات القديمة إلى Blob')} (${n})</button> <span class="hint" id="blSt"></span>`:'')}
+  catch(e){B.innerHTML=''}}
+async function snDraw(){blDraw();const L=$('snList');if(!L||!SRV.on)return;L.innerHTML='<p class="hint">'+_t('جارٍ التحميل')+'...</p>';
   try{const j=await api('snaplist'),K={auto:_t('تلقائية'),manual:_t('يدوية'),'pre-restore':_t('قبل استعادة')};
     L.innerHTML=(j.items||[]).length?j.items.map(x=>`<div class="lsG" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:6px 0;border-bottom:1px solid var(--bd,#ddd)"><span dir="ltr">${fmtTs(x.ts)}</span><span class="mu">${esc(K[x.kind]||x.kind)}</span><span class="mu">${Math.round(x.size/1024)} KB</span><span class="mu">${Object.keys(x.n||{}).length?esc((x.n.invoices||0)+' '+_t('فاتورة')+' · '+(x.n.receipts||0)+' '+_t('وصل')+' · '+(x.n.shipments||0)+' '+_t('شحنة')):''}</span><span style="flex:1"></span><button class="b3 sm" data-sd="${esc(x.id)}" type="button">${_t('تنزيل')}</button>${ME&&ME.admin?`<button class="b3 sm" data-sr="${esc(x.id)}" type="button">${_t('استعادة')}</button>`:''}</div>`).join(''):'<div class="empty">'+_t('لا نسخ بعد')+'.</div>'}
   catch(e){L.innerHTML='<p class="hint">'+esc(e.message)+'</p>'}}
 async function syDraw(){const L=$('syList');if(!L||!SRV.on)return;L.innerHTML='<p class="hint">'+_t('جارٍ التحميل')+'...</p>';
   try{const j=await api('syslog');L.innerHTML=(j.items||[]).length?j.items.map(x=>`<details style="padding:6px 0;border-bottom:1px solid var(--bd,#ddd)"><summary><span dir="ltr" class="mu">${fmtTs(x.ts)}</span> <b>${x.kind==='client'?_t('المتصفح'):_t('الخادم')}</b> ${esc(x.a||'')} ${x.who?'· '+esc(x.who):''} — ${esc(x.msg)}</summary><pre dir="ltr" style="white-space:pre-wrap;font-size:11px;margin:6px 0">${esc(x.info||'')}</pre></details>`).join(''):'<div class="empty">'+_t('لا أخطاء مسجلة')+'.</div>'}
   catch(e){L.innerHTML='<p class="hint">'+esc(e.message)+'</p>'}}
-document.addEventListener('click',async e=>{const t=e.target.closest&&e.target.closest('#gNav [data-g],#snNow,#snRef,#syRef,#syClr,[data-sd],[data-sr]');if(!t)return;
+document.addEventListener('click',async e=>{const t=e.target.closest&&e.target.closest('#gNav [data-g],#blMig,#snNow,#snRef,#syRef,#syClr,[data-sd],[data-sr]');if(!t)return;
   try{if(t.dataset.g==='snp')snDraw();else if(t.dataset.g==='sys')syDraw();
+    else if(t.id==='blMig'){t.disabled=true;try{let m;do{m=await api('blobmigrate');$('blSt').textContent=_t('المتبقي')+': '+((m.photos||0)+(m.files||0));if(!m.moved)break}while((m.photos||0)+(m.files||0)>0);toast((m.photos||0)+(m.files||0)?_t('تعذر نقل بعض الملفات — راجع سجل الأخطاء'):_t('تم نقل كل الملفات'),(m.photos||0)+(m.files||0)?'err':undefined)}finally{t.disabled=false}blDraw()}
     else if(t.id==='snRef')snDraw();else if(t.id==='syRef')syDraw();
     else if(t.id==='snNow'){t.disabled=true;try{await api('snapnow');toast(_t('تم أخذ النسخة'))}finally{t.disabled=false}snDraw()}
     else if(t.id==='syClr'){if(!confirm(_t('مسح سجل الأخطاء؟')))return;await api('sysclear');syDraw()}

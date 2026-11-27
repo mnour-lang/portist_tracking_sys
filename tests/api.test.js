@@ -246,6 +246,42 @@ const { makeHandler } = require('../lib/core');
     ck('list returns JS numbers (not strings)', n1 && typeof n1.t === 'number' && typeof n1.pd === 'number');
     ck('no floating-point drift stored (0.1+0.2 -> 0.3)', n1 && n1.t === 0.3);
   }
+  // ===== تخزين Blob (محاكاة): ملفات التصدير والصور تذهب للمخزن، مع نقل القديم والرجوع للقاعدة عند الفشل =====
+  {
+    const pg4 = new PGlite(), sq = async (t, p) => (await pg4.query(t, p || [])).rows;
+    const store = new Map(); let failPut = false;
+    const fake = { put: async (p, buf) => { if (failPut) throw new Error('blob down'); store.set(p, Buffer.from(buf)); }, get: async p => store.get(p) || null, del: async p => { store.delete(p); } };
+    const B = makeHandler({ sql: sq, env: { APP_PASSWORD: 'k', __TEST: 1 }, blob: fake });
+    const bc = o => B.run(Object.assign({ pw: 'k', u: 'bb', uh: 'hb' }, o));
+    await B.run({ pw: 'k', a: 'usave', user: mkU('Q1', 'bb', 'hb', [], { admin: true }) });
+    const JP = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=';
+    const b64 = JP.split(',')[1];
+    await bc({ a: 'shsave', code: 'SH-B1', isNew: true, d: { stat: 'ld', cons: [{ id: 'c1', cust: 'x', pk: '1', dl: [] }] } });
+    const ph = await bc({ a: 'phadd', ship: 'SH-B1', cid: 'c1', name: 'a.jpg', d: JP, t: JP });
+    const prow = (await sq('SELECT img,blob FROM photos'))[0];
+    ck('blob: photo original goes to the store, not the DB', ph.ok && prow.img === null && /^photos\//.test(prow.blob) && store.has(prow.blob));
+    ck('blob: photo read back identical', (await bc({ a: 'phget', id: ph.item.id })).d === JP && (await bc({ a: 'phget', id: ph.item.id, th: 1 })).d === JP);
+    const xf = await bc({ a: 'xsfput', name: 'a.pdf', mime: 'application/pdf', d: b64 });
+    const xrow = (await sq('SELECT b64,blob FROM xs_file'))[0];
+    ck('blob: export file goes to the store', xf.file && xrow.b64 === null && store.has(xrow.blob) && (await bc({ a: 'xsfget', id: xf.file.id })).d === b64);
+    await bc({ a: 'phdel', id: ph.item.id });
+    ck('blob: deleting a photo deletes the stored file', !(await sq('SELECT 1 FROM photos')).length && ![...store.keys()].some(k => k.startsWith('photos/')));
+    failPut = true;
+    const ph2 = await bc({ a: 'phadd', ship: 'SH-B1', cid: 'c1', name: 'b.jpg', d: JP, t: JP });
+    const p2 = (await sq('SELECT img,blob FROM photos WHERE id=$1', [ph2.item.id]))[0];
+    ck('blob: upload failure falls back to the database and is logged', ph2.ok && p2.img === JP && p2.blob === null && (await bc({ a: 'phget', id: ph2.item.id })).d === JP && (await sq("SELECT count(*)::int n FROM syslog WHERE kind='blob'"))[0].n >= 1);
+    failPut = false;
+    for (let i = 0; i < 6; i++) await sq("INSERT INTO xs_file(id,owner,name,mime,size,ts,b64) VALUES($1,'',$2,'application/pdf',10,$3,$4)", ['XF-old' + i, 'o' + i, Date.now(), b64]);
+    const st = await bc({ a: 'blobstat' });
+    ck('blob: status counts legacy files', st.on === true && st.photos === 1 && st.files === 6);
+    let m = await bc({ a: 'blobmigrate' }), guard = 0; while ((m.photos + m.files) > 0 && guard++ < 10) m = await bc({ a: 'blobmigrate' });
+    const left = (await sq('SELECT count(*)::int n FROM xs_file WHERE blob IS NULL AND b64 IS NOT NULL'))[0].n + (await sq('SELECT count(*)::int n FROM photos WHERE blob IS NULL AND img IS NOT NULL'))[0].n;
+    ck('blob: migration moves every legacy file in batches', left === 0 && (await bc({ a: 'xsfget', id: 'XF-old3' })).d === b64 && (await bc({ a: 'phget', id: ph2.item.id })).d === JP);
+    const lim = await B.run({ pw: 'k', a: 'usave', u: 'bb', uh: 'hb', user: mkU('Q2', 'lim', 'hl', ['xs']) });
+    ck('blob: migration needs backup permission + admin', !!(await B.run({ pw: 'k', a: 'blobmigrate', u: 'lim', uh: 'hl' })).err);
+    const nb = makeHandler({ sql: sq, env: { APP_PASSWORD: 'k', __TEST: 1 } });
+    ck('blob: without a store, status says off and migrate is refused', (await nb.run({ pw: 'k', a: 'blobstat', u: 'bb', uh: 'hb' })).on === false && !!(await nb.run({ pw: 'k', a: 'blobmigrate', u: 'bb', uh: 'hb' })).err);
+  }
   // ===== جلسات صارمة + نسخ تلقائي + سجل أخطاء =====
   {
     const pg2 = new PGlite(), sql = async (t, p) => (await pg2.query(t, p || [])).rows;
