@@ -226,6 +226,26 @@ const { makeHandler } = require('../lib/core');
   ck('isNew never overwrites existing or deleted', kv3.find(x => x.id === 'c1').v.name === 'أحمد' && kv3.find(x => x.id === 'c2').del === true);
   ck('unknown key ignored', (await H.run({ a: 'kvput', ...A, ops: [{ k: 'evil', id: 'x', v: 1 }] })).n === 0);
   ck('kv requires login', !!(await H.run({ a: 'kvget', since: 0 })).err && !!(await H.run({ a: 'sig', u: 'admin', uh: 'bad' })).err);
+  // ===== ترحيلات البنية + أعمدة المبالغ الرقمية =====
+  {
+    const pg3 = new PGlite(), sq = async (t, p) => (await pg3.query(t, p || [])).rows;
+    const cols = 'code text primary key, rcv text, date text, total double precision, cur text, updated double precision, data jsonb, status text, paid double precision';
+    await sq('CREATE TABLE invoices(' + cols + ')'); await sq('CREATE TABLE receipts(' + cols + ')');
+    await sq("INSERT INTO invoices(code,rcv,total,cur,updated,data,paid) VALUES('OLD1','x',1234.5,'USD',1,'{}'::jsonb,0.1)");
+    const M = makeHandler({ sql: sq, env: { APP_PASSWORD: 'k', __TEST: 1, SNAP_TEST: '1' } });
+    await M.run({ pw: 'k', a: 'usave', user: mkU('M1', 'mm', 'hm', [], { admin: true }) });
+    const ty = (await sq("SELECT data_type FROM information_schema.columns WHERE table_name='invoices' AND column_name='total'"))[0].data_type;
+    ck('migration converts money columns to numeric', ty === 'numeric');
+    ck('old values preserved', +(await sq("SELECT total FROM invoices WHERE code='OLD1'"))[0].total === 1234.5);
+    ck('migration recorded once', (await sq("SELECT count(*)::int n FROM schema_migrations WHERE id='001_money_numeric'"))[0].n === 1);
+    ck('safety snapshot taken before migrating existing data', (await sq("SELECT count(*)::int n FROM snaps WHERE kind='pre-migrate'"))[0].n === 1);
+    const lo = await M.run({ pw: 'k', a: 'ulogin', u: 'mm', uh: 'hm' });
+    await M.run({ pw: 'k', a: 'save', u: 'mm', uh: 'hm', code: 'N1', d: { rcv: 'ع', date: '2026-01-01', cur: 'USD', t: 0.1 + 0.2, st: 'sent', pd: 0 }, isNew: true });
+    const li = await M.run({ pw: 'k', a: 'list', u: 'mm', uh: 'hm' });
+    const n1 = (li.items || []).find(x => x.code === 'N1');
+    ck('list returns JS numbers (not strings)', n1 && typeof n1.t === 'number' && typeof n1.pd === 'number');
+    ck('no floating-point drift stored (0.1+0.2 -> 0.3)', n1 && n1.t === 0.3);
+  }
   // ===== جلسات صارمة + نسخ تلقائي + سجل أخطاء =====
   {
     const pg2 = new PGlite(), sql = async (t, p) => (await pg2.query(t, p || [])).rows;
