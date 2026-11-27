@@ -16,7 +16,7 @@ const invCr=code=>crMap()[code]||0,invRem=(code,d)=>r2(num(d.t)-num(d.pd)-invCr(
 async function adjInvoice(code,delta,no,keep){
   try{const D=LS.get('pst_inv',{});let d=D[code];
     if(CL.u()){let srv=null;try{srv=(await api('adj',{code:code,delta:delta,no:no,keep:!!keep})).d}catch(e){if(!/أمر غير معروف/.test(e.message)){msg((_t("تعذر تحديث الفاتورة")+" ")+code+': '+e.message);return false}}
-      if(srv){D[code]=srv;LS.set('pst_inv',D);if(ALL&&ALL.I)ALL.I[code]=Object.assign({},ALL.I[code]||{},{pd:srv.pd,st:srv.st});if($('code').value===code){$('paid').value=srv.pd;$('st').value=srv.st;S.rcs=srv.rcs;calc()}return true}
+      if(srv){D[code]=srv;LS.set('pst_inv',D);if($('code').value===code)S.bv=+srv.ver||0;if(ALL&&ALL.I)ALL.I[code]=Object.assign({},ALL.I[code]||{},{pd:srv.pd,st:srv.st});if($('code').value===code){$('paid').value=srv.pd;$('st').value=srv.st;S.rcs=srv.rcs;calc()}return true}
       try{d=(await api('get',{code:code})).d}catch(e){}}
     if(!d){msg((_t("الفاتورة")+" ")+code+(" "+_t("غير موجودة")+" — "+_t("لم يُحدَّث المدفوع فيها")));return false}
     d.pd=Math.max(0,r2(num(d.pd)+delta));const t=num(d.t)-invCr(code);
@@ -51,13 +51,13 @@ async function rsave(){if(!need('rc'))return;if(rid('void').checked&&!need('rc_v
   for(const k of Object.keys(want)){if(rem[k]==null||wantCv[k]>rem[k]+.004){toast((_t("المبلغ الموزَّع على")+" ")+k+(" "+_t("أكبر من المتبقي فيها")),'err');return}}
   const D=RCL();let d=rsnap(),note='';
   if(CL.u()){msg((_t("جارٍ الحفظ على الخادم")+"..."));
-    try{await api('rsave',{code:no,d:d,isNew:no!==R.opened});R.opened=no}
-    catch(e){if(e.message==='exists'&&no!==R.opened&&!rsave._r){rsave._r=1;try{const n=(await api('rnext')).code;rid('no').value=n;toast(no+' '+_t('مستخدم لوصل آخر — أُعطي هذا الوصل الرقم')+' '+n);await rsave()}catch(e2){msg(e2.message)}finally{rsave._r=0}return}if(e.message==='exists'){bad(rid('no'),(_t("الرقم مستخدم لوصل آخر")+" — "+_t("غيّره ثم احفظ")));return}if(e.net)qAdd('rsave',no,{d:d,isNew:no!==R.opened});note=(" ("+_t("تعذر الاتصال بالخادم")+": ")+e.message+(e.net?(" — "+_t("سيُرسل تلقائياً")):'')+')'}}
+    try{const rj=await api('rsave',Object.assign({code:no,d:d,isNew:no!==R.opened},no===R.opened?{bv:R.bv}:{}));R.opened=no;if(rj&&rj.ver!=null)R.bv=rj.ver}
+    catch(e){if(e.message==='conflict'&&e.j&&e.j.d){if(confirm(_t('عُدّل هذا الوصل من جهة أخرى بعد فتحه. موافق = تحميل النسخة الحالية (تُفقد تعديلاتك غير المحفوظة)، إلغاء = إبقاء تعديلاتك على الشاشة دون حفظ.'))){rload(e.j.d);R.opened=no;msg(_t('حُمّلت النسخة الحالية من الخادم'))}else msg(_t('لم يُحفظ — الوصل تغيّر على الخادم وتعديلاتك ما زالت على الشاشة'));return}if(e.message==='exists'&&no!==R.opened&&!rsave._r){rsave._r=1;try{const n=(await api('rnext')).code;rid('no').value=n;toast(no+' '+_t('مستخدم لوصل آخر — أُعطي هذا الوصل الرقم')+' '+n);await rsave()}catch(e2){msg(e2.message)}finally{rsave._r=0}return}if(e.message==='exists'){bad(rid('no'),(_t("الرقم مستخدم لوصل آخر")+" — "+_t("غيّره ثم احفظ")));return}if(e.net)qAdd('rsave',no,Object.assign({d:d,isNew:no!==R.opened},no===R.opened?{bv:R.bv}:{}));note=(" ("+_t("تعذر الاتصال بالخادم")+": ")+e.message+(e.net?(" — "+_t("سيُرسل تلقائياً")):'')+')'}}
   D[no]=d;LS.set('pst_rc',D);R.opened=no;const m=no.match(/^RC-(\d+)$/i);if(m&&+m[1]>LS.get('pst_rseq',0))LS.set('pst_rseq',+m[1]);
   const have=Object.assign({},R.alApplied),fin=Object.assign({},have),haveCv=Object.assign({},have,R.alCv),finCv=Object.assign({},haveCv);
   for(const k of new Set(Object.keys(want).concat(Object.keys(have)))){const dl=r2((wantCv[k]||0)-(haveCv[k]||0));if(Math.abs(dl)<.005)continue;
     if(await adjInvoice(k,dl,no,!!want[k])){if(want[k]){fin[k]=want[k];finCv[k]=wantCv[k]}else{delete fin[k];delete finCv[k]}}}
-  R.alApplied=fin;R.alCv=finCv;d=rsnap();D[no]=d;LS.set('pst_rc',D);if(CL.u()){try{await api('rsave',{code:no,d:d,isNew:false});{const Q=QS.get();if(Q['rsave|'+no]){delete Q['rsave|'+no];QS.set(Q);qBadge()}}}catch(e){if(e.net)qAdd('rsave',no,{d:d,isNew:false})}}
+  R.alApplied=fin;R.alCv=finCv;d=rsnap();D[no]=d;LS.set('pst_rc',D);if(CL.u()){try{const rj2=await api('rsave',{code:no,d:d,isNew:false});if(rj2&&rj2.ver!=null)R.bv=rj2.ver;{const Q=QS.get();if(Q['rsave|'+no]){delete Q['rsave|'+no];QS.set(Q);qBadge()}}}catch(e){if(e.net)qAdd('rsave',no,{d:d,isNew:false})}}
   const on=Object.keys(fin),rv2=Object.keys(have).filter(k=>!fin[k]);
   if(on.length)note+=(" — "+_t("وُزّعت على")+": ")+on.map(k=>k+' ('+f(fin[k])+')').join((_t("،")+" "));
   const un=rcUn(d);if(un>.004)note+=(" — "+_t("رصيد دائن للعميل")+" ")+fm(un,rv('cur'));

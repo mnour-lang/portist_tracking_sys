@@ -282,6 +282,34 @@ const { makeHandler } = require('../lib/core');
     const nb = makeHandler({ sql: sq, env: { APP_PASSWORD: 'k', __TEST: 1 } });
     ck('blob: without a store, status says off and migrate is refused', (await nb.run({ pw: 'k', a: 'blobstat', u: 'bb', uh: 'hb' })).on === false && !!(await nb.run({ pw: 'k', a: 'blobmigrate', u: 'bb', uh: 'hb' })).err);
   }
+  // ===== نسخ المستندات (ver) ومنع الكتابة فوق تعديل أحدث =====
+  {
+    const pg5 = new PGlite(), sq = async (t, p) => (await pg5.query(t, p || [])).rows;
+    const V = makeHandler({ sql: sq, env: { APP_PASSWORD: 'k', __TEST: 1 } });
+    await V.run({ pw: 'k', a: 'usave', user: mkU('V1', 'vv', 'hv', [], { admin: true }) });
+    const vc = o => V.run(Object.assign({ pw: 'k', u: 'vv', uh: 'hv' }, o));
+    const base = { rcv: 'عميل', date: '2026-01-01', cur: 'USD', t: 100, st: 'sent', pd: 0, rows: [], cols: [] };
+    const n1 = await vc({ a: 'save', code: 'VV-1', isNew: true, d: Object.assign({}, base) });
+    ck('ver: new document starts at version 1', n1.ok && n1.ver === 1);
+    const s2 = await vc({ a: 'save', code: 'VV-1', isNew: false, bv: 1, d: Object.assign({}, base, { rcv: 'عميل 2' }) });
+    ck('ver: save with the right base bumps the version', s2.ok && s2.ver === 2);
+    const stale = await vc({ a: 'save', code: 'VV-1', isNew: false, bv: 1, d: Object.assign({}, base, { rcv: 'قديم' }) });
+    ck('ver: stale base is refused as conflict and returns the current document', stale.err === 'conflict' && stale.ver === 2 && stale.d.rcv === 'عميل 2');
+    ck('ver: refused save changed nothing', (await vc({ a: 'get', code: 'VV-1' })).d.rcv === 'عميل 2');
+    const adj = await vc({ a: 'adj', code: 'VV-1', delta: 40, no: 'RC-1', keep: true });
+    ck('ver: payment adjustment bumps the version too', adj.ok && adj.d.ver === 3 && adj.d.pd === 40);
+    const stale2 = await vc({ a: 'save', code: 'VV-1', isNew: false, bv: 2, d: Object.assign({}, base, { rcv: 'من نسخة قبل الدفعة' }) });
+    ck('ver: an editor opened before a payment cannot overwrite it', stale2.err === 'conflict' && (await vc({ a: 'get', code: 'VV-1' })).d.pd === 40);
+    const noBv = await vc({ a: 'save', code: 'VV-1', isNew: false, d: Object.assign({}, base, { rcv: 'بدون bv', pd: 0, st: 'sent', rcs: [] }) });
+    const after = (await vc({ a: 'get', code: 'VV-1' })).d;
+    ck('ver: invoice save without bv still cannot erase paid amount or receipts (server-owned)', noBv.ok && after.pd === 40 && after.rcs.includes('RC-1') && after.st === 'partial' && after.ver === 4);
+    const par = await Promise.all([1, 2, 3].map(i => vc({ a: 'save', code: 'VV-1', isNew: false, bv: 4, d: Object.assign({}, base, { rcv: 'p' + i }) })));
+    ck('ver: concurrent saves from the same base -> exactly one wins', par.filter(x => x.ok).length === 1 && par.filter(x => x.err === 'conflict').length === 2);
+    await vc({ a: 'rsave', code: 'RC-V1', isNew: true, d: { rcv: 'x', date: '2026-01-01', cur: 'USD', t: 5 } });
+    const rs = await vc({ a: 'rsave', code: 'RC-V1', isNew: false, bv: 1, d: { rcv: 'x2', date: '2026-01-01', cur: 'USD', t: 5 } });
+    const rs2 = await vc({ a: 'rsave', code: 'RC-V1', isNew: false, bv: 1, d: { rcv: 'x3', date: '2026-01-01', cur: 'USD', t: 5 } });
+    ck('ver: receipts use the same protection', rs.ok && rs.ver === 2 && rs2.err === 'conflict' && rs2.d.rcv === 'x2');
+  }
   // ===== جلسات صارمة + نسخ تلقائي + سجل أخطاء =====
   {
     const pg2 = new PGlite(), sql = async (t, p) => (await pg2.query(t, p || [])).rows;

@@ -87,7 +87,7 @@ function activeSheet(){return S.mode==='r'?$('rsheet'):S.mode==='s'?$('ssheet'):
 function docName(){return S.mode==='s'?(S.sheetFn?S.docT:(_t("كشف حساب")+" - ")+(S.stmt?S.stmt.c.name:'')):S.mode==='r'?rv('no')+' - '+rv('from'):$('code').value+' - '+$('rcv').value}
 docName=withDoc(docName);
 function setLand(b){S.land=!!b;fitZoom();document.body.classList.toggle('land',curLand());$('orient').value=S.land?'l':'p';$('pg').textContent='@page{size:A4 '+(curLand()?'landscape':'portrait')+';margin:8mm 0}'}
-function load(d){S.ship=d.ship||'';S.ul=d.ul||'';setILock((d.st||'draft')!=='draft');S.cols=JSON.parse(JSON.stringify(d.cols));S.rows=JSON.parse(JSON.stringify(d.rows));
+function load(d){S.bv=+d.ver||0;S.ship=d.ship||'';S.ul=d.ul||'';setILock((d.st||'draft')!=='draft');S.cols=JSON.parse(JSON.stringify(d.cols));S.rows=JSON.parse(JSON.stringify(d.rows));
   ['code','cref','rcv','date','notes','cur','pk','cbm','due','cur2','rate','offno'].forEach(k=>$(k).value=d[k]||'');$('rate').value=fxOut(d.rate||'');$('paid').value=d.pd||'';setLang(d.lang||S.lang);$('st').value=d.st||'draft';S.rcs=d.rcs||[];setLand(d.land);
   $('showBank').checked=!!d.sb;document.querySelectorAll('.bk').forEach((c,i)=>c.checked=!!(d.bk||[])[i]);renderBank();render();grow();}
 function fillCref(){const v=$('rcv').value.trim();let c=findCust(v);if(!c){const bc=byCode(v);if(bc){$('rcv').value=bc.name;$('cref').value=bc.code;DIRTY.i=true;if(typeof calc==='function')calc();return}}if(c&&c.code&&!$('cref').value.trim()){$('cref').value=c.code;DIRTY.i=true}}
