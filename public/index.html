@@ -1050,8 +1050,8 @@ async function sharePdf(){const b=$('bShare');
 function refreshProds(){const P=LS.get('pst_prod',{});$('prods').innerHTML=Object.keys(P).map(n=>`<option value="${esc(n)}">`).join('')}
 const CL={u:()=>LS.get('pst_url',''),p:()=>LS.get('pst_pw','')};
 let cloudList=false;S.opened='';
-async function api(a,d){let j;try{const r=await fetch(CL.u(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({pw:CL.p(),a:a,u:ME?ME.user:''},ME&&ME.tok?{tok:ME.tok}:{uh:ME?ME.hash:''},d||{}))});j=await r.json()}catch(x){const e=new Error(x.message||(_t("تعذر الاتصال")));e.net=true;throw e}
-  if(j.err){const e=new Error(j.err);e.j=j;if(ME&&ME.tok&&/مصرّح|Unauthorized|Yetkisiz/.test(j.err)&&a!=='errrep'){setTimeout(()=>{if(ME&&ME.tok)logout(_t('انتهت الجلسة')+' — '+_t('سجّل الدخول من جديد'))},0)}throw e}return j}
+async function api(a,d){let j;const usedTok=!!(ME&&ME.tok);try{const r=await fetch(CL.u(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({pw:CL.p(),a:a,u:ME?ME.user:''},ME&&ME.tok?{tok:ME.tok}:{uh:ME?ME.hash:''},d||{}))});j=await r.json()}catch(x){const e=new Error(x.message||(_t("تعذر الاتصال")));e.net=true;throw e}
+  if(j.err){const e=new Error(j.err);e.j=j;if(usedTok&&ME&&ME.tok&&/مصرّح|Unauthorized|Yetkisiz/.test(j.err)&&a!=='errrep'){setTimeout(()=>{if(ME&&ME.tok)logout(_t('انتهت الجلسة')+' — '+_t('سجّل الدخول من جديد'))},0)}throw e}return j}
 /* طابور المزامنة: ما تعذّر إرساله بسبب انقطاع الاتصال يُحفظ ويُعاد إرساله تلقائياً */
 const QS={get:()=>LS.get('pst_q',{}),set:v=>LS.set('pst_q',v)};
 function qAdd(a,code,pl){const Q=QS.get(),k=a+'|'+code,o=Q[k];Q[k]={a:a,code:code,pl:pl,t:Date.now(),isNew:o?o.isNew:!!pl.isNew};QS.set(Q);qBadge()}
@@ -1969,8 +1969,8 @@ $('lgCloudGo').addEventListener('click',async()=>{const er=t=>{$('lgErr').textCo
     LS.set('pst_url',url);LS.set('pst_pw',cp);const U=US.get(),nu=Object.assign({},j.user,{hash:uh,tok:j.tok});U[nu.id]=nu;US.set(U);er('');enter(nu)}
   catch(e){er((_t("تعذر الدخول")+": ")+e.message)}});
 async function syncUsers(){if(!CL.u()||!ME)return;try{const j=await api('ulist'),U=US.get(),srv={};(j.items||[]).forEach(x=>srv[x.id]=x);
-    if(can('users')){for(const id of Object.keys(U)){if((!srv[id]&&U[id].hash)||(srv[id]&&num(U[id].ts)>num(srv[id].ts))){try{const pu=Object.assign({},U[id]);delete pu.tok;await api('usave',{user:pu})}catch(e){}}}}
-    let ch=false;Object.keys(srv).forEach(id=>{if(!U[id]||num(srv[id].ts)>num(U[id].ts)){const o=U[id],x=Object.assign({},srv[id]);if(o&&o.salt===x.salt&&o.hash)x.hash=o.hash;if(o&&o.tok)x.tok=o.tok;U[id]=x;ch=true}});
+    if(can('users')){for(const id of Object.keys(U)){if((!srv[id]&&U[id].hash)||(srv[id]&&num(U[id].ts)>num(srv[id].ts))){try{const pu=Object.assign({},U[id]);delete pu.tok;const sj=await api('usave',{user:pu});if(sj&&sj.tok&&ME&&id===ME.id){U[id].tok=sj.tok;ME=U[id]}}catch(e){}}}}
+    let ch=false;Object.keys(srv).forEach(id=>{if(!U[id]||num(srv[id].ts)>num(U[id].ts)){const o=U[id],x=Object.assign({},srv[id]);if(o&&o.salt===x.salt&&o.hash)x.hash=o.hash;if(o&&o.tok)x.tok=o.tok;if(SRV.on||(o&&o.cloud))x.cloud=1;U[id]=x;ch=true}});
     if(ch){US.set(U);if(U[ME.id]){ME=U[ME.id];if(ME.active===false){logout((_t("أُوقف حسابك")));return}applyPerms()}}}catch(e){}}
 /* إدارة المستخدمين */
 let UE=null;

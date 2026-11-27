@@ -3,6 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "description": "Portist Lojistik — نظام الشحنات والفواتير",
+  "scripts": { "build": "node tools/build.js", "check": "node tools/build.js --check", "test": "bash tests/run_all.sh" },
   "engines": { "node": ">=18" },
   "dependencies": { "@neondatabase/serverless": "^1.2.1" },
   "devDependencies": { "@electric-sql/pglite": "^0.5.16" }

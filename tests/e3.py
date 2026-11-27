@@ -83,10 +83,16 @@ with sync_playwright() as p:
     B.wait_for_function("!Object.keys(SHS.get()).includes('%s')"%c3,timeout=9000)
     ok('seq: deletion on A disappears from B list live',B.evaluate("!document.getElementById('shLst').innerText.includes('%s')"%c3))
     # رابط مباشر يعمل في وضع الخادم أيضاً بعد التحميل من القاعدة
-    B.goto(BASE+'#/shipments/'+code);B.reload();B.wait_for_timeout(3500)
+    B.goto(BASE+'#/shipments/'+code);B.reload()
+    try:B.wait_for_function("typeof SH!=='undefined'&&!!SH&&SH.code==='%s'"%code,timeout=20000)
+    except Exception:pass
+    B.wait_for_timeout(500)
     ok('server mode: deep link opens the shipment after loading from the DB',B.evaluate("!!ME&&S.mode==='h'&&document.getElementById('shEd').style.display!=='none'&&!!SH&&SH.code==='%s'"%code))
     # الخروج يمسح نسخة الجهاز، والدخول يعيد كل شيء من الخادم
-    B.evaluate("logout()");B.wait_for_timeout(2500)
+    B.evaluate("logout()")
+    try:B.wait_for_function("['pst_inv','pst_ship','pst_cust','pst_prod','pst_log','pst_users'].every(k=>localStorage.getItem(k)===null)",timeout=15000)
+    except Exception:pass
+    B.wait_for_timeout(500)
     ok('logout wipes local data cache',B.evaluate("['pst_inv','pst_ship','pst_cust','pst_prod','pst_log','pst_users'].every(k=>localStorage.getItem(k)===null)"))
     B.fill('#lgUser','admin@portist.com');B.fill('#lgPass','secret1');B.click('#lgGo');B.wait_for_timeout(2500)
     ok('re-login restores everything from the server',B.evaluate("!!ME&&Object.keys(SHS.get()).length>=1")==True or B.evaluate("Object.keys(LS.get('pst_prod',{})).length")>=1)

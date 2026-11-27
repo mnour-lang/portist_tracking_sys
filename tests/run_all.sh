@@ -2,6 +2,7 @@
 # تشغيل كل الاختبارات:  bash tests/run_all.sh
 # المتطلبات: node, python3 + playwright (pip install playwright && playwright install chromium)
 cd "$(dirname "$0")"; fail=0
+echo "== build (المصادر ↔ الملف المبني)"; node ../tools/build.js --check || fail=1
 echo "== server (Code.gs mock)"; node gstest.js | grep -E "FAIL" && fail=1
 echo "== API Postgres (PGlite)"; node api.test.js | grep -E "FAIL" && fail=1
 for t in a7 a8 t13 t14 t17 t18 t19 t20 t21 t24 t25 t26 t27 t28 t29 t30 t31 t32 t33 t34 t35 t36 t37 t38 t39 t40 t41 t42 t43 t44 t45 t46; do echo "== $t"; python3 $t.py 2>&1 | tee /tmp/_t.log | grep -E "FAIL|Traceback|Error" && fail=1; done
